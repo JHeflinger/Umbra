@@ -19,7 +19,7 @@
         GetScreenHeight(), \
         DIVIDER_HOVERED(x, y, w, h) || g_mouse_clicked_divider ? LIGHT_BLUE : GRAY_2);
 
-int g_central_divider = 200;
+int g_central_divider = 1200;
 int g_mouse_clicked_divider = 0;
 int g_focused_window = 1;
 

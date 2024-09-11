@@ -21,12 +21,14 @@
 
 int g_central_divider = 200;
 int g_mouse_clicked_divider = 0;
+int g_focused_window = 1;
 
 void DrawOverlay() {
     DrawRectangle(0, 0, GetScreenWidth(), NAMEBAR_HEIGHT, GRAY_1);
     DrawRectangle(0, NAMEBAR_HEIGHT, GetScreenWidth(), 3, GRAY_2);
-    DrawText("Viewport", 4, 4, 16, GRAY_X);
-    DrawText("Shader Chain", g_central_divider + 4 + 3, 4, 16, GRAY_X);
+
+    DrawText("Viewport", 4, 4, 16, g_focused_window == 0 ? YELLOW : GRAY_X);
+    DrawText("Shader Chain", g_central_divider + 4 + 3, 4, 16, g_focused_window == 1 ? YELLOW : GRAY_X);
 
     DRAW_DIVIDER(g_central_divider, NAMEBAR_HEIGHT, 3, GetScreenHeight() - NAMEBAR_HEIGHT);
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && DIVIDER_HOVERED(g_central_divider, NAMEBAR_HEIGHT, 3, GetScreenHeight() - NAMEBAR_HEIGHT)) g_mouse_clicked_divider = 1;
@@ -35,6 +37,10 @@ void DrawOverlay() {
         g_central_divider += GetMouseDelta().x;
     g_central_divider = g_central_divider < MIN_CONFIG_WIDTH ? MIN_CONFIG_WIDTH : (g_central_divider > GetScreenWidth() - MIN_CONFIG_WIDTH ? GetScreenWidth() - MIN_CONFIG_WIDTH : g_central_divider);
 
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), (Rectangle){ 0, 0, g_central_divider, GetScreenHeight() }))
+        g_focused_window = 0;
+    else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), (Rectangle){ g_central_divider, 0, GetScreenWidth() - g_central_divider, GetScreenHeight() }))
+        g_focused_window = 1;
 
     static float alpha = 0.0f;
     if (IsKeyDown(KEY_LEFT_ALT))

@@ -1,6 +1,7 @@
 #include "editor.h"
 #include "panels/viewport.h"
 #include "raylib.h"
+#include <stdio.h>
 
 #define GRAY_0 (Color){ 30, 30, 30, 255 }
 #define GRAY_1 (Color){ 50, 50, 50, 255 }

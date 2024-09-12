@@ -16,6 +16,8 @@ typedef struct {
 
 void InitializeScene(Scene* scene);
 
+void DrawScene(Scene* scene);
+
 void ResetSceneCamera(Scene* scene);
 
 #endif

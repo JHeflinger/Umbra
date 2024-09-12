@@ -5,6 +5,11 @@ void InitializeScene(Scene* scene) {
     ResetSceneCamera(scene);
 }
 
+void DrawScene(Scene* scene) {
+    DrawGrid(100, 1.0f);
+    DrawCube((Vector3){ 0, 0, 0 }, 5.0f, 5.0f, 5.0f, WHITE); 
+}
+
 void ResetSceneCamera(Scene* scene) {
     scene->camera3D.position = (Vector3){ 10, 10, 10 };
     scene->camera3D.target = (Vector3){ 0.0f, 0.0f, 0.0f };

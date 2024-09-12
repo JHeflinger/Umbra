@@ -18,7 +18,7 @@ void UpdateViewport() {
 	BeginTextureMode(g_ViewportTexture);
     ClearBackground(BLACK);
     BeginMode3D(g_Scene.camera3D);
-    DrawGrid(100, 1.0f);
+    DrawScene(&g_Scene);
     EndMode3D();
 	EndTextureMode();
 }
@@ -31,7 +31,7 @@ void RenderViewport(float x, float y, float w, float h) {
 }
 
 void ViewportInput() {
-    if (g_Scene.type = SCENE3D){
+    if (g_Scene.type == SCENE3D){
         float movement_speed = 20.0f * GetFrameTime();
         float rotation_sensitivity = 10.0f * GetFrameTime();
         Vector3 rotation = { 0 };

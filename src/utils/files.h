@@ -3,14 +3,14 @@
 
 #include "easyobjects.h"
 
+#define PATH_SIZE 1024
+
 typedef struct {
-    char raw[1024];
+    char raw[PATH_SIZE];
 } PathString;
 
-//DECLARE_ARRLIST(PathString);
+DECLARE_ARRLIST(PathString);
 
-//void PopulateFilePaths(ARRLIST_PathString* paths);
-
-void test();
+void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* dirpath);
 
 #endif

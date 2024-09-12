@@ -14,84 +14,57 @@
 #define PATH_SEPARATOR "/"
 #endif
 
-//IMPL_ARRLIST(PathString);
+IMPL_ARRLIST(PathString);
 
-//void PopulateFilePaths(ARRLIST_PathString* paths) {
+void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* dirpath) {
+    #ifdef _WIN32
 
-//}
-
-void list_c_files(const char *dir_path);
-
-#ifdef _WIN32
-void list_c_files_windows(const char *dir_path) {
     WIN32_FIND_DATA findFileData;
     char search_path[MAX_PATH];
-    snprintf(search_path, sizeof(search_path), "%s\\*", dir_path);
+    snprintf(search_path, sizeof(search_path), "%s\\*", dirpath);
     HANDLE hFind = FindFirstFile(search_path, &findFileData);
-
-    if (hFind == INVALID_HANDLE_VALUE) {
-        perror("FindFirstFile");
-        return;
-    }
-
     do {
         if (strcmp(findFileData.cFileName, ".") != 0 && strcmp(findFileData.cFileName, "..") != 0) {
             char path[MAX_PATH];
-            snprintf(path, sizeof(path), "%s\\%s", dir_path, findFileData.cFileName);
-
+            snprintf(path, sizeof(path), "%s\\%s", dirpath, findFileData.cFileName);
             if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                list_c_files_windows(path);
+                PopulateFilePaths(paths, extension, path);
             } else {
-                if (strstr(findFileData.cFileName, ".c") != NULL) {
-                    printf("%s\n", path);
+                if (strstr(findFileData.cFileName, extension) != NULL) {
+                    if (strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(extension), extension) == 0) {
+                        PathString ps = { 0 };
+                        memcpy(ps.raw, path, PATH_SIZE);
+                        ARRLIST_PathString_add(paths, ps);
+                    }
                 }
             }
         }
     } while (FindNextFile(hFind, &findFileData) != 0);
-
     FindClose(hFind);
-}
-#endif
 
-void list_c_files(const char *dir_path) {
-#ifdef _WIN32
-    list_c_files_windows(dir_path);
-#else
+    #else
+
     DIR *dir;
     struct dirent *entry;
     struct stat statbuf;
     char path[1024];
-
-    if ((dir = opendir(dir_path)) == NULL) {
-        perror("opendir");
-        return;
-    }
-
     while ((entry = readdir(dir)) != NULL) {
-        snprintf(path, sizeof(path), "%s%s%s", dir_path, PATH_SEPARATOR, entry->d_name);
-        if (stat(path, &statbuf) == -1) {
-            perror("stat");
-            continue;
-        }
-
+        snprintf(path, sizeof(path), "%s%s%s", dirpath, PATH_SEPARATOR, entry->d_name);
         if (S_ISDIR(statbuf.st_mode)) {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-                list_c_files(path);
+                PopulateFilePaths(paths, extension, path);
             }
         } else if (S_ISREG(statbuf.st_mode)) {
-            if (strstr(entry->d_name, ".c") != NULL) {
-                printf("%s\n", path);
+            if (strstr(entry->d_name, extension) != NULL) {
+                if (strcmp(entry->d_name + strlen(entry->d_name) - strlen(extension), extension) == 0) {
+                    PathString ps = { 0 };
+                    memcpy(ps.raw, path, PATH_SIZE);
+                    ARRLIST_PathString_add(paths, ps);
+                }
             }
         }
     }
-
     closedir(dir);
-#endif
-}
 
-
-void test() {
-    list_c_files(".");
-    printf("done!\n");
-    exit(0);
+    #endif
 }

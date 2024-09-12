@@ -44,18 +44,20 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
 
     #else
 
-    DIR *dir;
-    struct dirent *entry;
-    struct stat statbuf;
+    DIR* dir = opendir(dirpath);
+    struct dirent* entry = NULL;
+    struct stat statbuf = { 0 };
     char path[1024];
     while ((entry = readdir(dir)) != NULL) {
         snprintf(path, sizeof(path), "%s%s%s", dirpath, PATH_SEPARATOR, entry->d_name);
+		stat(path, &statbuf);
         if (S_ISDIR(statbuf.st_mode)) {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
                 PopulateFilePaths(paths, extension, path);
             }
         } else if (S_ISREG(statbuf.st_mode)) {
             if (strstr(entry->d_name, extension) != NULL) {
+				printf("%s\n", entry->d_name);
                 if (strcmp(entry->d_name + strlen(entry->d_name) - strlen(extension), extension) == 0) {
                     PathString ps = { 0 };
                     memcpy(ps.raw, path, PATH_SIZE);

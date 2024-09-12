@@ -14,13 +14,20 @@
 #define PATH_SEPARATOR "/"
 #endif
 
+//IMPL_ARRLIST(PathString);
+
+//void PopulateFilePaths(ARRLIST_PathString* paths) {
+
+//}
+
 void list_c_files(const char *dir_path);
 
 #ifdef _WIN32
 void list_c_files_windows(const char *dir_path) {
-    printf("starting\n");
     WIN32_FIND_DATA findFileData;
-    HANDLE hFind = FindFirstFile(strcat(strdup(dir_path), "\\*"), &findFileData);
+    char search_path[MAX_PATH];
+    snprintf(search_path, sizeof(search_path), "%s\\*", dir_path);
+    HANDLE hFind = FindFirstFile(search_path, &findFileData);
 
     if (hFind == INVALID_HANDLE_VALUE) {
         perror("FindFirstFile");
@@ -28,7 +35,6 @@ void list_c_files_windows(const char *dir_path) {
     }
 
     do {
-        printf("do\n");
         if (strcmp(findFileData.cFileName, ".") != 0 && strcmp(findFileData.cFileName, "..") != 0) {
             char path[MAX_PATH];
             snprintf(path, sizeof(path), "%s\\%s", dir_path, findFileData.cFileName);
@@ -41,7 +47,6 @@ void list_c_files_windows(const char *dir_path) {
                 }
             }
         }
-        printf("end\n");
     } while (FindNextFile(hFind, &findFileData) != 0);
 
     FindClose(hFind);
@@ -87,5 +92,6 @@ void list_c_files(const char *dir_path) {
 
 void test() {
     list_c_files(".");
+    printf("done!\n");
     exit(0);
 }

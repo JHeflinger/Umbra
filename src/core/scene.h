@@ -4,16 +4,18 @@
 #include "raylib.h"
 
 typedef enum {
-    Orthographic = 0,
-    Perspective = 1
-} CameraType;
+    SCENE2D = 0,
+    SCENE3D = 1
+} SceneType;
 
 typedef struct {
-    CameraType type;
+    SceneType type;
     Camera camera3D;
     Camera2D camera2D;
 } Scene;
 
 void InitializeScene(Scene* scene);
+
+void ResetSceneCamera(Scene* scene);
 
 #endif

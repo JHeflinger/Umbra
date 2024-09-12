@@ -9,4 +9,6 @@ void UpdateViewport();
 
 void RenderViewport(float x, float y, float w, float h);
 
+void ViewportInput();
+
 #endif

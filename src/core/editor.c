@@ -64,6 +64,7 @@ void RunEditor() {
     InitializeViewport();
     while(!WindowShouldClose()) {
         UpdateViewport();
+        if (g_focused_window == 0) ViewportInput();
         BeginDrawing();
         ClearBackground(GRAY_0);
         DrawPanels();

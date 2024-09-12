@@ -23,7 +23,7 @@ void UpdateViewport() {
 	EndTextureMode();
 }
 
-void RenderViewport(float x, float y, float w, float h) {
+void DrawViewport(float x, float y, float w, float h) {
     DrawTextureRec(
 		g_ViewportTexture.texture,
 		CLITERAL(Rectangle){ g_ViewportTexture.texture.width/2 - w/2, 0, w, -h },

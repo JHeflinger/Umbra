@@ -57,7 +57,6 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
             }
         } else if (S_ISREG(statbuf.st_mode)) {
             if (strstr(entry->d_name, extension) != NULL) {
-				printf("%s\n", entry->d_name);
                 if (strcmp(entry->d_name + strlen(entry->d_name) - strlen(extension), extension) == 0) {
                     PathString ps = { 0 };
                     memcpy(ps.raw, path, PATH_SIZE);

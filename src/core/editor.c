@@ -89,7 +89,7 @@ void DrawOverlay() {
 
 void DrawPanels() {
     DrawViewport(0, NAMEBAR_HEIGHT, g_central_divider, GetScreenHeight() - NAMEBAR_HEIGHT);
-	DrawExplorer(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, GetScreenHeight() - NAMEBAR_HEIGHT);
+	DrawExplorer(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, g_sub_divider);
 }
 
 void RunEditor() {

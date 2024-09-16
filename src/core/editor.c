@@ -1,14 +1,9 @@
 #include "editor.h"
+#include "utils/colors.h"
 #include "panels/viewport.h"
 #include "panels/explorer.h"
 #include "raylib.h"
 #include <stdio.h>
-
-#define GRAY_0 (Color){ 30, 30, 30, 255 }
-#define GRAY_1 (Color){ 40, 40, 40, 255 }
-#define GRAY_2 (Color){ 100, 100, 100, 255 }
-#define GRAY_X (Color){ 210, 210, 210, 255 }
-#define LIGHT_BLUE (Color){ 100, 100, 200, 255 }
 
 #define NAMEBAR_HEIGHT 25
 #define MIN_VIEWPORT_WIDTH 200

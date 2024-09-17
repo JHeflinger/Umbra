@@ -7,6 +7,7 @@
 
 typedef struct {
     char raw[PATH_SIZE];
+	int active;
 } PathString;
 
 DECLARE_ARRLIST(PathString);

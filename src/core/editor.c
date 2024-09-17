@@ -4,6 +4,7 @@
 #include "panels/explorer.h"
 #include "raylib.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define NAMEBAR_HEIGHT 25
 #define MIN_VIEWPORT_WIDTH 200
@@ -123,7 +124,7 @@ void DrawOverlay() {
     alpha = alpha < 0 ? 0 : (alpha > 255 ? 255 : alpha);
     char buffer[256];
     sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
-    DrawText(buffer, 10, 10, 18, (Color){ 255, 255, 255, alpha });
+    DrawText(buffer, 10, GetScreenHeight() - 20, 18, (Color){ 255, 255, 255, alpha });
 }
 
 void DrawPanels() {

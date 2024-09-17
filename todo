@@ -6,3 +6,12 @@ all shaders can get certain data
 debug features!
 
 make explorere refresh every ~1 second?
+
+
+next up:
+- render shader chain
+- render scene properly
+- serialize scene
+- edit file feature
+- profiler
+- debugger

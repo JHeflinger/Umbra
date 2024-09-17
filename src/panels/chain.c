@@ -1,5 +1,6 @@
 #include "chain.h"
 #include "utils/structs.h"
+#include "utils/colors.h"
 #include "raylib.h"
 #include <string.h>
 
@@ -57,7 +58,40 @@ void DrawChain(float x, float y, float w, float h) {
 		int ypos = y + 10 + (20*i) + g_chain_disposition;
 		int xpos = x + 10;
 		if (ypos < y + h && ypos > y - 20.0f) {
-			DrawText(ARRLIST_PathString_get(&g_active_shaders, ARRLIST_size_t_get(&g_shader_chain_order, i)).raw, xpos, ypos, 14, RAYWHITE);
+			PathString ps = ARRLIST_PathString_get(&g_active_shaders, ARRLIST_size_t_get(&g_shader_chain_order, i));
+			char buffer[2048];
+			sprintf(buffer, "%d.) %s", i + 1, ps.raw);
+			if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, ypos - 2, w, 18 })) {
+				int modval = 55;
+				if (i <= 0) modval -= 22;
+				if (i >= g_shader_chain_order.size - 1) modval -= 23;
+				DrawRectangle(xpos - 5, ypos - 2, MeasureText(buffer, 14) + 4 + modval, 18, GRAY_2);
+				xpos += 45;
+				int uphovered = 0;
+				int downhovered = 0;
+				if (i > 0 && CheckCollisionPointRec(GetMousePosition(), (Rectangle){xpos - 45, ypos, 14, 14 })) {
+					uphovered = 1;
+					if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+						size_t temp = g_shader_chain_order.data[i];
+						g_shader_chain_order.data[i] = g_shader_chain_order.data[i - 1];
+						g_shader_chain_order.data[i - 1] = temp;
+					}
+				} else if (i < g_shader_chain_order.size - 1 && CheckCollisionPointRec(GetMousePosition(), i > 0 ? (Rectangle){ xpos - 24, ypos, 14, 14 } : (Rectangle){xpos - 45, ypos, 14, 14 })) {
+					downhovered = 1;
+					if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+						size_t temp = g_shader_chain_order.data[i];
+						g_shader_chain_order.data[i] = g_shader_chain_order.data[i + 1];
+						g_shader_chain_order.data[i + 1] = temp;
+					}
+				}
+				if (i > 0)
+					DrawTriangle((Vector2){ xpos - 31, ypos + 12 }, (Vector2){ xpos - 38, ypos + 2 }, (Vector2){ xpos - 45, ypos + 12 }, uphovered == 1 ? YELLOW : RAYWHITE);
+				else xpos -= 22;
+				if (i < g_shader_chain_order.size - 1)
+					DrawTriangle((Vector2){ xpos - 24, ypos + 2 }, (Vector2){ xpos - 17, ypos + 12 }, (Vector2){ xpos - 10, ypos + 2 }, downhovered == 1 ? YELLOW : RAYWHITE);
+				else xpos -= 23;
+			}
+			DrawText(buffer, xpos, ypos, 14, RAYWHITE);
 		}
 	}
 }

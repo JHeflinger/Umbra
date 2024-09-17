@@ -25,7 +25,7 @@ void DrawExplorer(float x, float y, float w, float h) {
 					g_shader_paths.data[i].active = !g_shader_paths.data[i].active;
 					UpdateChain(&g_shader_paths);
 				}
-				DrawRectangle(xpos - 5, ypos - 2, MeasureText(ARRLIST_PathString_get(&g_shader_paths, i).raw, 14) + 4, 18, GRAY_2);
+				DrawRectangle(xpos - 5, ypos - 2, MeasureText(ARRLIST_PathString_get(&g_shader_paths, i).raw, 14) + 4 + 30, 18, GRAY_2);
 				xpos += 20;
 				DrawRectangle(xpos - 20, ypos + 6, 12, 3, RAYWHITE);
 				if (ARRLIST_PathString_get(&g_shader_paths, i).active == 0)

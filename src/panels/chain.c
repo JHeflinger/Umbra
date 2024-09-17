@@ -5,6 +5,7 @@
 
 ARRLIST_PathString g_active_shaders = { 0 };
 ARRLIST_size_t g_shader_chain_order = { 0 };
+float g_chain_disposition = 0.0f;
 
 void UpdateChain(ARRLIST_PathString* paths) {
 	for (int i = 0; i < paths->size; i++) {
@@ -47,7 +48,16 @@ void UpdateChain(ARRLIST_PathString* paths) {
 }
 
 void DrawChain(float x, float y, float w, float h) {
+	if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, y, w, h })) {
+		g_chain_disposition += GetMouseWheelMoveV().y * 20.0f;
+	}
+	g_chain_disposition = g_chain_disposition > 0.0f ? 0.0f : (g_chain_disposition < -20.0f * (g_shader_chain_order.size + 1) + h ? -20.0f * (g_shader_chain_order.size + 1) + h : g_chain_disposition);
+	if ((g_shader_chain_order.size + 1) * 20.0f < h) g_chain_disposition = 0.0f;
 	for (int i = 0; i < g_shader_chain_order.size; i++) {
-		DrawText(ARRLIST_PathString_get(&g_active_shaders, ARRLIST_size_t_get(&g_shader_chain_order, i)).raw, x + 10, y + 10 + (i*20), 14, RAYWHITE);
+		int ypos = y + 10 + (20*i) + g_chain_disposition;
+		int xpos = x + 10;
+		if (ypos < y + h && ypos > y - 20.0f) {
+			DrawText(ARRLIST_PathString_get(&g_active_shaders, ARRLIST_size_t_get(&g_shader_chain_order, i)).raw, xpos, ypos, 14, RAYWHITE);
+		}
 	}
 }

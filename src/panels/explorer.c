@@ -1,5 +1,6 @@
 #include "explorer.h"
 #include "utils/colors.h"
+#include "panels/chain.h"
 #include "raylib.h"
 
 ARRLIST_PathString g_shader_paths = { 0 };
@@ -20,8 +21,10 @@ void DrawExplorer(float x, float y, float w, float h) {
 		int xpos = x + 10;
 		if (ypos < y + h && ypos > -20.0f) {
 			if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, ypos - 2, w, 18 })) {
-				if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+				if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 					g_shader_paths.data[i].active = !g_shader_paths.data[i].active;
+					UpdateChain(&g_shader_paths);
+				}
 				DrawRectangle(xpos - 5, ypos - 2, MeasureText(ARRLIST_PathString_get(&g_shader_paths, i).raw, 14) + 4, 18, GRAY_2);
 				xpos += 20;
 				DrawRectangle(xpos - 20, ypos + 6, 12, 3, RAYWHITE);
@@ -32,8 +35,4 @@ void DrawExplorer(float x, float y, float w, float h) {
 			DrawText(ps.raw, xpos, ypos, 14, ps.active == 1 ? YELLOW : RAYWHITE);
 		}
 	}
-}
-
-ARRLIST_PathString* GetPaths() {
-	return &g_shader_paths;
 }

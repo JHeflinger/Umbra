@@ -1,5 +1,6 @@
 #include "editor.h"
 #include "utils/colors.h"
+#include "panels/chain.h"
 #include "panels/viewport.h"
 #include "panels/explorer.h"
 #include "raylib.h"
@@ -43,7 +44,7 @@ int g_mouse_clicked_divider = 0;
 int g_mouse_clicked_sub_divider = 0;
 int g_focused_window = VIEWPORT_FOCUSED;
 int g_tr_semi_focused = EXPLORER_FOCUSED;
-int g_br_semi_focused = PROFILER_FOCUSED;
+int g_br_semi_focused = CHAIN_FOCUSED;
 
 void DrawOverlay() {
 
@@ -131,6 +132,8 @@ void DrawPanels() {
     DrawViewport(0, NAMEBAR_HEIGHT, g_central_divider, GetScreenHeight() - NAMEBAR_HEIGHT);
     if (g_tr_semi_focused == EXPLORER_FOCUSED)
 	    DrawExplorer(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, g_sub_divider);
+	if (g_br_semi_focused == CHAIN_FOCUSED)
+		DrawChain(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, GetScreenHeight() - NAMEBAR_HEIGHT - NAMEBAR_HEIGHT - g_sub_divider);
 }
 
 void RunEditor() {

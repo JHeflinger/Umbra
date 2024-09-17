@@ -1,5 +1,4 @@
 #include "explorer.h"
-#include "utils/files.h"
 #include "utils/colors.h"
 #include "raylib.h"
 
@@ -33,4 +32,8 @@ void DrawExplorer(float x, float y, float w, float h) {
 			DrawText(ps.raw, xpos, ypos, 14, ps.active == 1 ? YELLOW : RAYWHITE);
 		}
 	}
+}
+
+ARRLIST_PathString* GetPaths() {
+	return &g_shader_paths;
 }

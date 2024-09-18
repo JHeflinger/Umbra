@@ -7,6 +7,8 @@ debug features!
 
 make explorere refresh every ~1 second?
 
+warn when a scene object wil not be rendered bc there isn't a shader stage for it
+
 
 next up:
 - render shader chain

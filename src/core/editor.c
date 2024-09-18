@@ -123,9 +123,11 @@ void DrawOverlay() {
     else 
         alpha -= 900.0f * GetFrameTime();
     alpha = alpha < 0 ? 0 : (alpha > 255 ? 255 : alpha);
-    char buffer[256];
+    char buffer[1024];
     sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
     DrawText(buffer, 10, GetScreenHeight() - 20, 18, (Color){ 255, 255, 255, alpha });
+	sprintf(buffer, "MEM: %d", (int)EZALLOCATED());
+	DrawText(buffer, 10, GetScreenHeight() - 40, 18, (Color){ 255, 255, 255, alpha });
 }
 
 void DrawPanels() {

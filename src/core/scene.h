@@ -2,7 +2,7 @@
 #define SCENE_H
 
 #include "raylib.h"
-#include "easyobjects.h"
+#include "utils/structs.h"
 
 typedef enum {
     SCENE2D = 0,
@@ -29,9 +29,12 @@ typedef struct {
 	float slices;
 	float step;
 	Vector3 rotation;
+	Color color;
+	size_t stage;
 } SceneObject;
 
 DECLARE_ARRLIST(SceneObject);
+DECLARE_ARRLIST(ARRLIST_size_t);
 
 typedef struct {
     SceneType type;
@@ -40,10 +43,16 @@ typedef struct {
 	ARRLIST_SceneObject objects;
 } Scene;
 
-void InitializeScene(Scene* scene);
+Scene* GetScene();
 
-void DrawScene(Scene* scene);
+void InitializeScene();
 
-void ResetSceneCamera(Scene* scene);
+void DrawScene();
+
+void DrawSceneStage(size_t stage);
+
+void DrawLeftovers();
+
+void ResetSceneCamera();
 
 #endif

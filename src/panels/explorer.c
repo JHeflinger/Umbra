@@ -7,7 +7,7 @@ ARRLIST_PathString g_shader_paths = { 0 };
 float g_explorer_disposition = 0.0f;
 
 void InitializeExplorer() {
-    PopulateFilePaths(&g_shader_paths, ".c", ".");
+    PopulateFilePaths(&g_shader_paths, ".fs", ".");
 }
 
 void DrawExplorer(float x, float y, float w, float h) {

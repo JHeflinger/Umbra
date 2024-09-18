@@ -4,7 +4,7 @@
 #include <string.h>
 
 #ifdef _WIN32
-#include <windows.h>
+#include "platform/clean_windows.h"
 #define PATH_SEPARATOR "\\"
 #else
 #include <dirent.h>

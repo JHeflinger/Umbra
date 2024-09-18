@@ -1,5 +1,6 @@
 #include "viewport.h"
 #include "core/scene.h"
+#include "panels/chain.h"
 #include "raylib.h"
 
 RenderTexture2D g_ViewportTexture = { 0 };
@@ -21,6 +22,17 @@ void UpdateViewport() {
     DrawScene(&g_Scene);
     EndMode3D();
 	EndTextureMode();
+    for (int i = 0; i < ShaderChainSize(); i++) {
+        BeginTextureMode(g_ViewportTexture);
+        BeginShaderMode(GetShaderInChain(i));
+        DrawTextureRec(
+            g_ViewportTexture.texture, 
+            (Rectangle){ 0, 0, (float)g_ViewportTexture.texture.width, 
+            (float)-g_ViewportTexture.texture.height }, 
+            (Vector2){ 0.0f , 0.0f }, WHITE);
+        EndShaderMode();
+        EndTextureMode();
+    }
 }
 
 void DrawViewport(float x, float y, float w, float h) {

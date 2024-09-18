@@ -137,7 +137,7 @@ void DrawPanels() {
 }
 
 void RunEditor() {
-	SetTraceLogLevel(LOG_NONE);
+	SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(1600, 900, "Umbra");
     InitializeViewport();
@@ -151,6 +151,7 @@ void RunEditor() {
         DrawOverlay();
         EndDrawing();
     }
+    CleanChain();
     CleanViewport();
     CloseWindow();
 }

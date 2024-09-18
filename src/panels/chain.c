@@ -21,6 +21,8 @@ void UpdateChain(ARRLIST_PathString* paths) {
 				}
 			}
 			if (found == 0) {
+				str.shader.active = 1;
+				str.shader.shader = LoadShader(0, str.raw);
 				ARRLIST_PathString_add(&g_active_shaders, str);
 				ARRLIST_size_t_add(&g_shader_chain_order, g_active_shaders.size - 1);
 			}
@@ -35,6 +37,7 @@ void UpdateChain(ARRLIST_PathString* paths) {
 				}
 			}
 			if (found == 1) {
+				UnloadShader(ARRLIST_PathString_get(&g_active_shaders, removal).shader.shader);
 				ARRLIST_PathString_remove(&g_active_shaders, removal);
 				int order_ind = -1;
 				for (int j = 0; j < g_shader_chain_order.size; j++) {
@@ -93,5 +96,19 @@ void DrawChain(float x, float y, float w, float h) {
 			}
 			DrawText(buffer, xpos, ypos, 14, RAYWHITE);
 		}
+	}
+}
+
+size_t ShaderChainSize() {
+	return g_active_shaders.size;
+}
+
+Shader GetShaderInChain(size_t index) {
+	return ARRLIST_PathString_get(&g_active_shaders, ARRLIST_size_t_get(&g_shader_chain_order, index)).shader.shader;
+}
+
+void CleanChain() {
+	for (int i = 0; i < g_active_shaders.size; i++) {
+		UnloadShader(g_active_shaders.data[i].shader.shader);
 	}
 }

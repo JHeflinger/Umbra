@@ -11,7 +11,9 @@ make explorere refresh every ~1 second?
 next up:
 - render shader chain
 - render scene properly
+- implement vertex shaders
 - serialize scene
 - edit file feature
 - profiler
+- hot reloading for everything
 - debugger

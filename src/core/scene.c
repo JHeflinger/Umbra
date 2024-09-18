@@ -1,13 +1,31 @@
 #include "scene.h"
 
+IMPL_ARRLIST(SceneObject);
+
 void InitializeScene(Scene* scene) {
     scene->type = SCENE3D;
     ResetSceneCamera(scene);
+
+	SceneObject grid = { 0 };
+	grid.type = SCENE_GRID;
+	grid.slices = 100;
+	grid.step = 10;
+	ARRLIST_SceneObject_add(&scene->objects, grid);
 }
 
 void DrawScene(Scene* scene) {
-    DrawGrid(100, 1.0f);
-    DrawCube((Vector3){ 0, 0, 0 }, 5.0f, 5.0f, 5.0f, WHITE); 
+	if (scene->type == SCENE3D) {
+		for (int i = 0; i < scene->objects.size; i++) {
+			SceneObject obj = ARRLIST_SceneObject_get(&scene->objects, i);
+			switch (obj.type) {
+				case SCENE_GRID:
+					DrawGrid(obj.slices, obj.step);
+					break;
+				default: break;
+			}
+		}
+		DrawCube((Vector3){ 0, 0, 0 }, 5.0f, 5.0f, 5.0f, WHITE);
+	}
 }
 
 void ResetSceneCamera(Scene* scene) {

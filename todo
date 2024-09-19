@@ -11,9 +11,7 @@ warn when a scene object wil not be rendered bc there isn't a shader stage for i
 
 
 next up:
-- render shader chain
-- render scene properly
-- implement vertex shaders
+- gbgrphgct
 - serialize scene
 - edit file feature
 - profiler

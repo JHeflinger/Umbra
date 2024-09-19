@@ -55,4 +55,8 @@ void DrawLeftovers();
 
 void ResetSceneCamera();
 
+void SaveScene(const char* path);
+
+void LoadScene(const char* path);
+
 #endif

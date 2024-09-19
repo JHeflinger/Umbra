@@ -58,6 +58,8 @@ void InitializeScene() {
 	sphere.radius = 4.0f;
 	sphere.color = (Color){ 155, 255, 155, 255 };
 	ARRLIST_SceneObject_add(&g_scene.objects, sphere);
+
+	SaveScene("default.poopx");
 }
 
 void DrawScene() {
@@ -102,4 +104,16 @@ void ResetSceneCamera() {
     g_scene.camera3D.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     g_scene.camera3D.fovy = 90.0f;
     g_scene.camera3D.projection = CAMERA_PERSPECTIVE;
+}
+
+void SaveScene(const char* path) {
+	printf("SCENE TYPE: %s {\n", g_scene.type == SCENE3D ? "3D" : "2D");
+	for (int i = 0; i < g_scene.objects.size; i++) {
+		
+	}
+	printf("}\n");
+}
+
+void LoadScene(const char* path) {
+
 }

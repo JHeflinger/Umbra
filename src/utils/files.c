@@ -16,7 +16,7 @@
 
 IMPL_ARRLIST(PathString);
 
-void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* dirpath) {
+void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* alternate, const char* dirpath) {
     #ifdef _WIN32
 
     WIN32_FIND_DATA findFileData;
@@ -28,12 +28,13 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
             char path[MAX_PATH];
             snprintf(path, sizeof(path), "%s\\%s", dirpath, findFileData.cFileName);
             if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                PopulateFilePaths(paths, extension, path);
+                PopulateFilePaths(paths, extension, alternate, path);
             } else {
-                if (strstr(findFileData.cFileName, extension) != NULL) {
-                    if (strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(extension), extension) == 0) {
+                if (strstr(findFileData.cFileName, extension) != NULL || strstr(findFileData.cFileName, alternate) != NULL) {
+                    if (strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(extension), extension) == 0 || strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0) {
                         PathString ps = { 0 };
                         memcpy(ps.raw, path, PATH_SIZE);
+						ps.alternate = strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0;
                         ARRLIST_PathString_add(paths, ps);
                     }
                 }
@@ -41,7 +42,6 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
         }
     } while (FindNextFile(hFind, &findFileData) != 0);
     FindClose(hFind);
-
     #else
 
     DIR* dir = opendir(dirpath);
@@ -53,13 +53,14 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
 		stat(path, &statbuf);
         if (S_ISDIR(statbuf.st_mode)) {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-                PopulateFilePaths(paths, extension, path);
+                PopulateFilePaths(paths, extension, alternate, path);
             }
         } else if (S_ISREG(statbuf.st_mode)) {
-            if (strstr(entry->d_name, extension) != NULL) {
-                if (strcmp(entry->d_name + strlen(entry->d_name) - strlen(extension), extension) == 0) {
+            if (strstr(entry->d_name, extension) != NULL || strstr(entry->d_name, alternate) != NULL) {
+                if (strcmp(entry->d_name + strlen(entry->d_name) - strlen(extension), extension) == 0 || strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0) {
                     PathString ps = { 0 };
                     memcpy(ps.raw, path, PATH_SIZE);
+					ps.alternate = strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0;
                     ARRLIST_PathString_add(paths, ps);
                 }
             }

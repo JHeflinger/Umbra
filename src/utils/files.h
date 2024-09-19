@@ -15,10 +15,11 @@ typedef struct {
     char raw[PATH_SIZE];
 	int active;
     SafeShader shader;
+	int alternate;
 } PathString;
 
 DECLARE_ARRLIST(PathString);
 
-void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* dirpath);
+void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const char* alternate, const char* dirpath);
 
 #endif

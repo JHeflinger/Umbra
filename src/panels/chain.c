@@ -22,7 +22,7 @@ void UpdateChain(ARRLIST_PathString* paths) {
 			}
 			if (found == 0) {
 				str.shader.active = 1;
-				str.shader.shader = LoadShader(0, str.raw);
+				str.shader.shader = str.alternate ? LoadShader(str.raw, 0) : LoadShader(0, str.raw);
 				ARRLIST_PathString_add(&g_active_shaders, str);
 				ARRLIST_size_t_add(&g_shader_chain_order, g_active_shaders.size - 1);
 			}

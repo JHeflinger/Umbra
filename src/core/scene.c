@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "panels/chain.h"
+#include "utils/files.h"
 
 IMPL_ARRLIST(SceneObject);
 IMPL_ARRLIST(ARRLIST_size_t);
@@ -59,7 +60,7 @@ void InitializeScene() {
 	sphere.color = (Color){ 155, 255, 155, 255 };
 	ARRLIST_SceneObject_add(&g_scene.objects, sphere);
 
-	SaveScene("default.poopx");
+	SaveScene("default.slumbra");
 }
 
 void DrawScene() {
@@ -107,11 +108,67 @@ void ResetSceneCamera() {
 }
 
 void SaveScene(const char* path) {
-	printf("SCENE TYPE: %s {\n", g_scene.type == SCENE3D ? "3D" : "2D");
+	char* savedata = EZALLOC(20 + g_scene.objects.size*200, sizeof(char));
+	size_t data_len = 0;
+	data_len += sprintf(savedata + data_len, "SCENE%s {\n", g_scene.type == SCENE3D ? "3D" : "2D");
 	for (int i = 0; i < g_scene.objects.size; i++) {
-		
+		SceneObject obj = ARRLIST_SceneObject_get(&g_scene.objects, i);
+		switch (obj.type) {
+			case SCENE_GRID:
+				data_len += sprintf(savedata + data_len, "\tGrid {\n");
+				data_len += sprintf(savedata + data_len, "\t\tslices: %f\n", obj.slices);
+				data_len += sprintf(savedata + data_len, "\t\tstep: %f\n", obj.step);
+				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
+				data_len += sprintf(savedata + data_len, "\t}\n");
+				break;
+			case SCENE_CUBE:
+				data_len += sprintf(savedata + data_len, "\tCube {\n");
+				data_len += sprintf(savedata + data_len, "\t\tx: %f\n", obj.x);
+				data_len += sprintf(savedata + data_len, "\t\ty: %f\n", obj.y);
+				data_len += sprintf(savedata + data_len, "\t\tz: %f\n", obj.z);
+				data_len += sprintf(savedata + data_len, "\t\tw: %f\n", obj.w);
+				data_len += sprintf(savedata + data_len, "\t\tl: %f\n", obj.l);
+				data_len += sprintf(savedata + data_len, "\t\th: %f\n", obj.h);
+				data_len += sprintf(savedata + data_len, "\t\tcolor: %d %d %d %d\n", obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
+				data_len += sprintf(savedata + data_len, "\t}\n");
+				break;
+			case SCENE_SPHERE:
+				data_len += sprintf(savedata + data_len, "\tSphere {\n");
+				data_len += sprintf(savedata + data_len, "\t\tx: %f\n", obj.x);
+				data_len += sprintf(savedata + data_len, "\t\ty: %f\n", obj.y);
+				data_len += sprintf(savedata + data_len, "\t\tz: %f\n", obj.z);
+				data_len += sprintf(savedata + data_len, "\t\tradius: %f\n", obj.radius);
+				data_len += sprintf(savedata + data_len, "\t\tcolor: %d %d %d %d\n", obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
+				data_len += sprintf(savedata + data_len, "\t}\n");
+				break;
+			case SCENE_RECTANGLE:
+				data_len += sprintf(savedata + data_len, "\tRectangle {\n");
+				data_len += sprintf(savedata + data_len, "\t\tx: %f\n", obj.x);
+				data_len += sprintf(savedata + data_len, "\t\ty: %f\n", obj.y);
+				data_len += sprintf(savedata + data_len, "\t\tw: %f\n", obj.w);
+				data_len += sprintf(savedata + data_len, "\t\th: %f\n", obj.h);
+				data_len += sprintf(savedata + data_len, "\t\trotation: %f\n", obj.rotation);
+				data_len += sprintf(savedata + data_len, "\t\tcolor: %d %d %d %d\n", obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
+				data_len += sprintf(savedata + data_len, "\t}\n");
+				break;
+			case SCENE_CIRCLE:
+				data_len += sprintf(savedata + data_len, "\tCircle {\n");
+				data_len += sprintf(savedata + data_len, "\t\tx: %f\n", obj.x);
+				data_len += sprintf(savedata + data_len, "\t\ty: %f\n", obj.y);
+				data_len += sprintf(savedata + data_len, "\t\tradius: %f\n", obj.radius);
+				data_len += sprintf(savedata + data_len, "\t\tcolor: %d %d %d %d\n", obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
+				data_len += sprintf(savedata + data_len, "\t}\n");
+				break;
+			default: break;
+		}
 	}
-	printf("}\n");
+	data_len += sprintf(savedata + data_len, "}");
+	SaveFile(savedata, strlen(savedata), path);
+	EZFREE(savedata);
 }
 
 void LoadScene(const char* path) {

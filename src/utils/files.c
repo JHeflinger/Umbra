@@ -31,10 +31,10 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
                 PopulateFilePaths(paths, extension, alternate, path);
             } else {
                 if (strstr(findFileData.cFileName, extension) != NULL || strstr(findFileData.cFileName, alternate) != NULL) {
-                    if (strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(extension), extension) == 0 || strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0) {
+                    if (strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(extension), extension) == 0 || strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(alternate), alternate) == 0) {
                         PathString ps = { 0 };
                         memcpy(ps.raw, path, PATH_SIZE);
-						ps.alternate = strcmp(entry->d_name + strlen(entry->d_name) - strlen(alternate), alternate) == 0;
+						ps.alternate = strcmp(findFileData.cFileName + strlen(findFileData.cFileName) - strlen(alternate), alternate) == 0;
                         ARRLIST_PathString_add(paths, ps);
                     }
                 }
@@ -69,4 +69,19 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
     closedir(dir);
 
     #endif
+}
+
+int SaveFile(const char* data, size_t datalen, const char* path) {
+    FILE *file = fopen(path, "wb");
+    if (file == NULL) {
+        printf("Error opening file to save %s\n", path);
+        return -1;
+    }
+    size_t written = fwrite(data, sizeof(char), datalen, file);
+    if (written != datalen) {
+        printf("Error writing file to save %s\n", path);
+        return -1;
+    }
+    fclose(file);
+    return 0;
 }

@@ -28,7 +28,7 @@ typedef struct {
 	float radius;
 	float slices;
 	float step;
-	Vector3 rotation;
+	float rotation;
 	Color color;
 	size_t stage;
 } SceneObject;

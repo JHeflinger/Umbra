@@ -79,8 +79,9 @@ PrunedLine prune_line(const char* line) {
 	}
 
 	if (strcmp(pl.moniker, "SCENE2D") == 0 || strcmp(pl.moniker, "SCENE3D") == 0) {
-		strcpy(pl.valstr[0], pl.moniker + 5);
+		strcpy(pl.valstr[pl.numvals], pl.moniker + 5);
 		pl.moniker[5] = '\0';
+		pl.numvals++;
 	}
 
 	return pl;
@@ -137,8 +138,16 @@ void InitializeScene() {
 	sphere.color = (Color){ 155, 255, 155, 255 };
 	ARRLIST_SceneObject_add(&g_scene.objects, sphere);
 
+	SceneObject rectangle = { 0 };
+	rectangle.type = SCENE_RECTANGLE;
+	ARRLIST_SceneObject_add(&g_scene.objects, rectangle);
+
+	SceneObject circle = { 0 };
+	circle.type = SCENE_CIRCLE;
+	ARRLIST_SceneObject_add(&g_scene.objects, circle);
+
 	LoadSceneError err = LoadScene("default.slumbra");
-	printf("error: %d\n", (int)err.type);
+	printf("error: %d on line %d\n", (int)err.type, (int)err.line);
 }
 
 void DrawScene() {
@@ -253,11 +262,15 @@ LoadSceneError LoadScene(const char* path) {
 	LoadSceneError error = { 0 };
 	FILE *file = fopen(path, "r");
 	Scene tempscene = { 0 };
+	SceneObject tempobj = { 0 };
+	int scene_init = 0;
+	int adding_obj = 0;
+	int done = 0;
     if (file == NULL) {
 		error.type = UNABLE_TO_OPEN_FILE;
         return error;
     }
-
+	#define RETERR(err) { error.type = err; fclose(file); return error; }
     char line[MAX_LINE_SIZE];
     while (fgets(line, MAX_LINE_SIZE, file)) {
 		error.line += 1;
@@ -265,11 +278,108 @@ LoadSceneError LoadScene(const char* path) {
         if (len > 0 && line[len - 1] == '\n') {
             line[len - 1] = '\0';
         } else if (len >= MAX_LINE_SIZE) {
-			error.type = OBNOXIOUS_LONG_LINE;
-			return error;
+			RETERR(OBNOXIOUS_LONG_LINE);
 		}
 
+		int checkempt_ind = 0;
+		int empty_line = 1;
+		while(line[checkempt_ind] != '\0' && checkempt_ind < MAX_LINE_SIZE) {
+			if (line[checkempt_ind] != ' ' && line[checkempt_ind] != '\t') {
+				empty_line = 0;
+				break;
+			}
+			checkempt_ind++;
+		}
+		if (empty_line == 1) continue;
+		if (done == 1) RETERR(OUTSIDE_SCENE_DEF);
+
 		PrunedLine pl = prune_line(line);
+
+		if (scene_init == 0) {
+			if (strcmp("SCENE", pl.moniker) == 0) {
+				if (pl.numvals != 1)
+					RETERR(INVALID_NUM_SCENE_ARGS);
+				if (strcmp("3D", pl.valstr[0]) == 0) {
+					tempscene.type = SCENE3D;
+				} else if (strcmp("2D", pl.valstr[0]) == 0) {
+					tempscene.type = SCENE2D;
+				} else {
+					RETERR(INVALID_SCENE_ARG);
+				}
+			} else {
+				RETERR(NO_START_SCENE_MONIKER);
+			}
+			scene_init = 1;
+		} else if (adding_obj == 0 && strcmp("N/A", pl.moniker) == 0 && pl.endbracket == 1) {
+			done = 1;
+		} else {
+			if (adding_obj == 0) {
+				tempobj = (SceneObject){ 0 };
+				adding_obj = 1;
+				if (strcmp("Cube", pl.moniker) == 0) {
+					tempobj.type = SCENE_CUBE;	
+				} else if (strcmp("Sphere", pl.moniker) == 0) {
+					tempobj.type = SCENE_SPHERE;
+				} else if (strcmp("Grid", pl.moniker) == 0) {
+					tempobj.type = SCENE_GRID;
+				} else if (strcmp("Rectangle", pl.moniker) == 0) {
+					tempobj.type = SCENE_RECTANGLE;
+				} else if (strcmp("Circle", pl.moniker) == 0) {
+					tempobj.type = SCENE_CIRCLE;
+				} else {
+					RETERR(INVALID_OBJECT_MONIKER);
+				}
+				if (pl.startbracket != 1) RETERR(NO_START_BRACKET);
+				if (pl.numvals != 0) RETERR(INVALID_NUM_OBJECT_ARGS);
+				if (pl.endbracket == 1) RETERR(UNALLOWED_END_BRACKET);
+				if (pl.property == 1) RETERR(INVALID_PROPERTY);
+			} else if (adding_obj == 1) {
+				if (pl.endbracket) {
+					if (pl.startbracket == 1) RETERR(UNALLOWED_START_BRACKET);
+					if (pl.numvals != 0) RETERR(INVALID_NUM_OBJECT_ARGS);
+					if (pl.property == 1) RETERR(INVALID_PROPERTY);
+					ARRLIST_SceneObject_add(&tempscene.objects, tempobj);
+					adding_obj = 0;
+				} else if (pl.property) {
+					switch (tempobj.type) {
+						case SCENE_CUBE:
+							if (strcmp("x", pl.moniker)	== 0) {
+
+							} else if (strcmp("y", pl.moniker) == 0) {
+
+							} else if (strcmp("z", pl.moniker) == 0) {
+
+							} else if (strcmp("w", pl.moniker) == 0) {
+
+							} else if (strcmp("h", pl.moniker) == 0) {
+
+							} else if (strcmp("l", pl.moniker) == 0) {
+
+							} else if (strcmp("color", pl.moniker) == 0) {
+
+							} else if (strcmp("stage", pl.moniker) == 0) {
+
+							} else {
+								RETERR(INVALID_PROPERTY);
+							}
+							break;
+						case SCENE_SPHERE:
+							break;
+						case SCENE_GRID:
+							break;
+						case SCENE_RECTANGLE:
+							break;
+						case SCENE_CIRCLE:
+							break;
+						default:
+							RETERR(SHOULD_NEVER_HAPPEN);
+					}
+				} else {
+					RETERR(INVALID_PROPERTY);
+				}
+			}
+		}
+
 		printf("PRUNED LINE:\n");
 		printf("\t moniker: \"%s\"\n", pl.moniker);
 		printf("\t endbracket: \"%s\"\n", pl.endbracket == 1 ? "YES" : "NO");
@@ -283,8 +393,9 @@ LoadSceneError LoadScene(const char* path) {
 
 	fclose(file);
 	Scene t = g_scene;
-	g_scene = tempscene;
+	g_scene = tempscene;// when overriding a scene, dont forget to clear the scene objects from memory
 	SaveScene("debug.slumbra");
 	g_scene = t;
 	return error;
+	#undef RETERR
 }

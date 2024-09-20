@@ -2,12 +2,52 @@
 #include "panels/chain.h"
 #include "utils/files.h"
 
+#define MAX_LINE_SIZE 256
+
 IMPL_ARRLIST(SceneObject);
 IMPL_ARRLIST(ARRLIST_size_t);
 
 Scene g_scene;
 ARRLIST_ARRLIST_size_t g_stage_chain;
 ARRLIST_size_t g_leftovers;
+
+typedef struct {
+	char moniker[MAX_LINE_SIZE];
+	char valstr[MAX_LINE_SIZE];
+	int startbracket;
+	int endbracket;
+	int property;
+} PrunedLine;
+
+PrunedLine prune_line(const char* line) {
+	PrunedLine pl = { 0 };
+
+	int ind = 0;
+	int parsing_moniker = 0;
+	int moniker_ind = 0;
+	#define CHECK_NOT_TRAIL(x) (x != ' ' && x != '\t')
+	#define CHECK_YES_TRAIL(x) (x == ' ' || x == '\t')
+	while (line[ind] != '\0') {
+		if (parsing_moniker == 0 && CHECK_NOT_TRAIL(line[ind])) parsing_moniker = 1;
+		if (parsing_moniker == 1) {
+			if (CHECK_YES_TRAIL(line[ind])) parsing_moniker = 2;
+			else {
+				pl.moniker[moniker_ind] = line[ind];
+				moniker_ind++;
+			}
+		}
+		ind++;
+	}
+	#undef CHECK_NOT_TRAIL
+	#undef CHECK_YES_TRAIL
+
+	if (strcmp(pl.moniker, "}") == 0) {
+		strcpy(pl.moniker, "N/A");
+		pl.endbracket = 1;
+	}
+
+	return pl;
+}
 
 void draw_scene_object(SceneObject obj) {
 	switch (obj.type) {
@@ -60,7 +100,8 @@ void InitializeScene() {
 	sphere.color = (Color){ 155, 255, 155, 255 };
 	ARRLIST_SceneObject_add(&g_scene.objects, sphere);
 
-	SaveScene("default.slumbra");
+	LoadSceneError err = LoadScene("default.slumbra");
+	printf("error: %d\n", (int)err.type);
 }
 
 void DrawScene() {
@@ -171,6 +212,37 @@ void SaveScene(const char* path) {
 	EZFREE(savedata);
 }
 
-void LoadScene(const char* path) {
+LoadSceneError LoadScene(const char* path) {
+	LoadSceneError error = { 0 };
+	FILE *file = fopen(path, "r");
+	Scene tempscene = { 0 };
+    if (file == NULL) {
+		error.type = UNABLE_TO_OPEN_FILE;
+        return error;
+    }
 
+    char line[MAX_LINE_SIZE];
+    while (fgets(line, MAX_LINE_SIZE, file)) {
+		error.line += 1;
+        size_t len = strlen(line);
+        if (len > 0 && line[len - 1] == '\n') {
+            line[len - 1] = '\0';
+        } else if (len >= MAX_LINE_SIZE) {
+			error.type = OBNOXIOUS_LONG_LINE;
+			return error;
+		}
+
+		PrunedLine pl = prune_line(line);
+		printf("PRUNED LINE:\n");
+		printf("\t moniker: \"%s\"\n", pl.moniker);
+		printf("\t endbracket: \"%s\"\n", pl.endbracket == 1 ? "YES" : "NO");
+		printf("\n");
+    }
+
+	fclose(file);
+	Scene t = g_scene;
+	g_scene = tempscene;
+	SaveScene("debug.slumbra");
+	g_scene = t;
+	return error;
 }

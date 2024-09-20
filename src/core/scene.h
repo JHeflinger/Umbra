@@ -43,6 +43,18 @@ typedef struct {
 	ARRLIST_SceneObject objects;
 } Scene;
 
+typedef enum {
+	NONE = 0,
+	UNABLE_TO_OPEN_FILE = 1,
+	OBNOXIOUS_LONG_LINE = 2,
+} LoadErrorCode;
+
+typedef struct {
+	LoadErrorCode type;
+	size_t line;
+	size_t col;
+} LoadSceneError;
+
 Scene* GetScene();
 
 void InitializeScene();
@@ -57,6 +69,6 @@ void ResetSceneCamera();
 
 void SaveScene(const char* path);
 
-void LoadScene(const char* path);
+LoadSceneError LoadScene(const char* path);
 
 #endif

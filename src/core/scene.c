@@ -3,6 +3,7 @@
 #include "utils/files.h"
 
 #define MAX_LINE_SIZE 256
+#define MAX_ARGS 4
 
 IMPL_ARRLIST(SceneObject);
 IMPL_ARRLIST(ARRLIST_size_t);
@@ -13,7 +14,8 @@ ARRLIST_size_t g_leftovers;
 
 typedef struct {
 	char moniker[MAX_LINE_SIZE];
-	char valstr[MAX_LINE_SIZE];
+	char valstr[MAX_ARGS][MAX_LINE_SIZE];
+	int numvals;
 	int startbracket;
 	int endbracket;
 	int property;
@@ -25,15 +27,33 @@ PrunedLine prune_line(const char* line) {
 	int ind = 0;
 	int parsing_moniker = 0;
 	int moniker_ind = 0;
+	int parsing_args = 0;
+	int arg_ind = 0;
 	#define CHECK_NOT_TRAIL(x) (x != ' ' && x != '\t')
 	#define CHECK_YES_TRAIL(x) (x == ' ' || x == '\t')
 	while (line[ind] != '\0') {
 		if (parsing_moniker == 0 && CHECK_NOT_TRAIL(line[ind])) parsing_moniker = 1;
 		if (parsing_moniker == 1) {
-			if (CHECK_YES_TRAIL(line[ind])) parsing_moniker = 2;
-			else {
+			if (CHECK_YES_TRAIL(line[ind])) {
+				parsing_moniker = 2;
+			} else {
 				pl.moniker[moniker_ind] = line[ind];
 				moniker_ind++;
+			}
+		}
+		if (parsing_moniker == 2) {
+			if (CHECK_NOT_TRAIL(line[ind])) {
+				if (parsing_args == 0) {
+					parsing_args = 1;
+					arg_ind = 0;
+					pl.numvals++;
+				}
+			} else {
+				parsing_args = 0;
+			}
+			if (parsing_args == 1) {
+				pl.valstr[pl.numvals - 1][arg_ind] = line[ind];
+				arg_ind++;
 			}
 		}
 		ind++;
@@ -44,6 +64,23 @@ PrunedLine prune_line(const char* line) {
 	if (strcmp(pl.moniker, "}") == 0) {
 		strcpy(pl.moniker, "N/A");
 		pl.endbracket = 1;
+	}
+
+	if (strcmp(pl.valstr[0], "{") == 0) {
+		pl.numvals--;
+		pl.startbracket = 1;
+		for (int i = 0; i < MAX_ARGS - 1; i++)
+			strcpy(pl.valstr[i], pl.valstr[i+1]);
+	}
+
+	if (pl.moniker[strlen(pl.moniker) - 1] == ':') {
+		pl.property = 1;
+		pl.moniker[strlen(pl.moniker) - 1] = '\0';
+	}
+
+	if (strcmp(pl.moniker, "SCENE2D") == 0 || strcmp(pl.moniker, "SCENE3D") == 0) {
+		strcpy(pl.valstr[0], pl.moniker + 5);
+		pl.moniker[5] = '\0';
 	}
 
 	return pl;
@@ -236,6 +273,11 @@ LoadSceneError LoadScene(const char* path) {
 		printf("PRUNED LINE:\n");
 		printf("\t moniker: \"%s\"\n", pl.moniker);
 		printf("\t endbracket: \"%s\"\n", pl.endbracket == 1 ? "YES" : "NO");
+		printf("\t startbracket: \"%s\"\n", pl.startbracket == 1 ? "YES" : "NO");
+		printf("\t property: \"%s\"\n", pl.property == 1 ? "YES" : "NO");
+		for (int i = 0; i < 4; i++) {
+			if (pl.valstr[i][0] != '\0') printf("\t valstr %d: \"%s\"\n", i+1, pl.valstr[i]);
+		}
 		printf("\n");
     }
 

@@ -26,7 +26,7 @@ typedef struct {
 	float l;
 	float h;
 	float radius;
-	float slices;
+	size_t slices;
 	float step;
 	float rotation;
 	Color color;
@@ -57,6 +57,9 @@ typedef enum {
 	INVALID_PROPERTY = 10,
 	OUTSIDE_SCENE_DEF = 11,
 	UNALLOWED_START_BRACKET = 12,
+	NOT_A_FLOAT = 13,
+	INVALID_NUM_ARGS = 14,
+	NOT_AN_INT = 15,
 	SHOULD_NEVER_HAPPEN = 999,
 } LoadErrorCode;
 

@@ -1,6 +1,10 @@
 #include "scene.h"
 #include "panels/chain.h"
 #include "utils/files.h"
+#include <stdlib.h>
+#include <errno.h>
+#include <stdbool.h>
+
 
 #define MAX_LINE_SIZE 256
 #define MAX_ARGS 4
@@ -112,42 +116,10 @@ Scene* GetScene() {
 	return &g_scene;
 }
 
-void InitializeScene() {
-    g_scene.type = SCENE3D;
-    ResetSceneCamera();
-
-	SceneObject grid = { 0 };
-	grid.type = SCENE_GRID;
-	grid.slices = 100;
-	grid.step = 10;
-	ARRLIST_SceneObject_add(&g_scene.objects, grid);
-
-	SceneObject cube = { 0 };
-	cube.type = SCENE_CUBE;
-	cube.w = 5.0f;
-	cube.l = 10.0f;
-	cube.h = 5.0f;
-	cube.color = (Color){ 255, 155, 155, 255 };
-	ARRLIST_SceneObject_add(&g_scene.objects, cube);
-
-	SceneObject sphere = { 0 };
-	sphere.type = SCENE_SPHERE;
-	sphere.x = 10.0f;
-	sphere.stage = 2;
-	sphere.radius = 4.0f;
-	sphere.color = (Color){ 155, 255, 155, 255 };
-	ARRLIST_SceneObject_add(&g_scene.objects, sphere);
-
-	SceneObject rectangle = { 0 };
-	rectangle.type = SCENE_RECTANGLE;
-	ARRLIST_SceneObject_add(&g_scene.objects, rectangle);
-
-	SceneObject circle = { 0 };
-	circle.type = SCENE_CIRCLE;
-	ARRLIST_SceneObject_add(&g_scene.objects, circle);
-
+void InitializeScene() {	
 	LoadSceneError err = LoadScene("default.slumbra");
-	printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+	if (err.type != NONE)
+		printf("error: %d on line %d\n", (int)err.type, (int)err.line);
 }
 
 void DrawScene() {
@@ -203,7 +175,7 @@ void SaveScene(const char* path) {
 		switch (obj.type) {
 			case SCENE_GRID:
 				data_len += sprintf(savedata + data_len, "\tGrid {\n");
-				data_len += sprintf(savedata + data_len, "\t\tslices: %f\n", obj.slices);
+				data_len += sprintf(savedata + data_len, "\t\tslices: %d\n", (int)obj.slices);
 				data_len += sprintf(savedata + data_len, "\t\tstep: %f\n", obj.step);
 				data_len += sprintf(savedata + data_len, "\t\tstage: %d\n", (int)obj.stage);
 				data_len += sprintf(savedata + data_len, "\t}\n");
@@ -341,61 +313,151 @@ LoadSceneError LoadScene(const char* path) {
 					ARRLIST_SceneObject_add(&tempscene.objects, tempobj);
 					adding_obj = 0;
 				} else if (pl.property) {
+					if (pl.startbracket == 1) RETERR(UNALLOWED_START_BRACKET);
+					if (pl.endbracket == 1) RETERR(UNALLOWED_END_BRACKET);
+					char* endptr;
+					#define GETFLOAT(setto, getstr) {errno = 0; setto = strtof(getstr, &endptr); if (errno != 0 || endptr == getstr || *endptr != '\0') RETERR(NOT_A_FLOAT);}
+					#define GETINT(setto, getstr) {errno = 0; setto = (size_t)strtol(getstr, &endptr, 10); if (errno != 0 || endptr == getstr || *endptr != '\0') RETERR(NOT_AN_INT);}
 					switch (tempobj.type) {
 						case SCENE_CUBE:
 							if (strcmp("x", pl.moniker)	== 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.x, pl.valstr[0]);
 							} else if (strcmp("y", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.y, pl.valstr[0]);
 							} else if (strcmp("z", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.z, pl.valstr[0]);
 							} else if (strcmp("w", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.w, pl.valstr[0]);
 							} else if (strcmp("h", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.h, pl.valstr[0]);
 							} else if (strcmp("l", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.l, pl.valstr[0]);
 							} else if (strcmp("color", pl.moniker) == 0) {
-
+								if (pl.numvals != 4) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.color.r, pl.valstr[0]);
+								GETINT(tempobj.color.g, pl.valstr[1]);
+								GETINT(tempobj.color.b, pl.valstr[2]);
+								GETINT(tempobj.color.a, pl.valstr[3]);
 							} else if (strcmp("stage", pl.moniker) == 0) {
-
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.stage, pl.valstr[0]);
 							} else {
 								RETERR(INVALID_PROPERTY);
 							}
 							break;
 						case SCENE_SPHERE:
+							if (strcmp("x", pl.moniker)	== 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.x, pl.valstr[0]);
+							} else if (strcmp("y", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.y, pl.valstr[0]);
+							} else if (strcmp("z", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.z, pl.valstr[0]);
+							} else if (strcmp("radius", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.radius, pl.valstr[0]);
+							} else if (strcmp("color", pl.moniker) == 0) {
+								if (pl.numvals != 4) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.color.r, pl.valstr[0]);
+								GETINT(tempobj.color.g, pl.valstr[1]);
+								GETINT(tempobj.color.b, pl.valstr[2]);
+								GETINT(tempobj.color.a, pl.valstr[3]);
+							} else if (strcmp("stage", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.stage, pl.valstr[0]);
+							} else {
+								RETERR(INVALID_PROPERTY);
+							}
 							break;
 						case SCENE_GRID:
+							if (strcmp("slices", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.slices, pl.valstr[0]);
+							} else if (strcmp("step", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.step, pl.valstr[0]);
+							} else if (strcmp("stage", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.stage, pl.valstr[0]);
+							} else {
+								RETERR(INVALID_PROPERTY);
+							}
 							break;
 						case SCENE_RECTANGLE:
+							if (strcmp("x", pl.moniker)	== 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.x, pl.valstr[0]);
+							} else if (strcmp("y", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.y, pl.valstr[0]);
+							} else if (strcmp("w", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.w, pl.valstr[0]);
+							} else if (strcmp("h", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.h, pl.valstr[0]);
+							} else if (strcmp("rotation", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.rotation, pl.valstr[0]);
+							} else if (strcmp("color", pl.moniker) == 0) {
+								if (pl.numvals != 4) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.color.r, pl.valstr[0]);
+								GETINT(tempobj.color.g, pl.valstr[1]);
+								GETINT(tempobj.color.b, pl.valstr[2]);
+								GETINT(tempobj.color.a, pl.valstr[3]);
+							} else if (strcmp("stage", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.stage, pl.valstr[0]);
+							} else {
+								RETERR(INVALID_PROPERTY);
+							}
 							break;
 						case SCENE_CIRCLE:
+							if (strcmp("x", pl.moniker)	== 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.x, pl.valstr[0]);
+							} else if (strcmp("y", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.y, pl.valstr[0]);
+							} else if (strcmp("radius", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETFLOAT(tempobj.radius, pl.valstr[0]);
+							} else if (strcmp("color", pl.moniker) == 0) {
+								if (pl.numvals != 4) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.color.r, pl.valstr[0]);
+								GETINT(tempobj.color.g, pl.valstr[1]);
+								GETINT(tempobj.color.b, pl.valstr[2]);
+								GETINT(tempobj.color.a, pl.valstr[3]);
+							} else if (strcmp("stage", pl.moniker) == 0) {
+								if (pl.numvals != 1) RETERR(INVALID_NUM_ARGS);
+								GETINT(tempobj.stage, pl.valstr[0]);
+							} else {
+								RETERR(INVALID_PROPERTY);
+							}
 							break;
 						default:
 							RETERR(SHOULD_NEVER_HAPPEN);
 					}
+					#undef GETFLOAT
 				} else {
 					RETERR(INVALID_PROPERTY);
 				}
 			}
 		}
-
-		printf("PRUNED LINE:\n");
-		printf("\t moniker: \"%s\"\n", pl.moniker);
-		printf("\t endbracket: \"%s\"\n", pl.endbracket == 1 ? "YES" : "NO");
-		printf("\t startbracket: \"%s\"\n", pl.startbracket == 1 ? "YES" : "NO");
-		printf("\t property: \"%s\"\n", pl.property == 1 ? "YES" : "NO");
-		for (int i = 0; i < 4; i++) {
-			if (pl.valstr[i][0] != '\0') printf("\t valstr %d: \"%s\"\n", i+1, pl.valstr[i]);
-		}
-		printf("\n");
     }
 
 	fclose(file);
-	Scene t = g_scene;
-	g_scene = tempscene;// when overriding a scene, dont forget to clear the scene objects from memory
-	SaveScene("debug.slumbra");
-	g_scene = t;
+	ARRLIST_SceneObject_clear(&g_scene.objects);
+	g_scene = tempscene;
+	ResetSceneCamera();
 	return error;
 	#undef RETERR
 }

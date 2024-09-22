@@ -94,7 +94,18 @@ PrunedLine prune_line(const char* line) {
 void draw_scene_object(SceneObject obj) {
 	switch (obj.type) {
 		case SCENE_GRID:
-			DrawGrid(obj.slices, obj.step);
+			if (g_scene.type == SCENE3D) DrawGrid(obj.slices, obj.step);
+			else {
+				float max = obj.step * obj.slices;
+				for (int i = 0; i <= obj.slices / 2; i++) {
+					DrawLine((float)i * -1.0f * obj.step, max/2.0f, (float)i * -1.0f * obj.step, max/-2.0f, RAYWHITE);
+					DrawLine(max/-2.0f, (float)i * -1.0f * obj.step, max/2.0f, (float)i * -1.0f * obj.step, RAYWHITE);
+					DrawLine((float)i * obj.step, max/2.0f, (float)i * obj.step, max/-2.0f, RAYWHITE);
+					DrawLine(max/-2.0f, (float)i * obj.step, max/2.0f, (float)i * obj.step, RAYWHITE);
+				}
+				DrawLine(0, max/2.0f, 0, max/-2.0f, (Color){ 100, 100, 100, 255 });
+				DrawLine(max/-2.0f, 0, max/2.0f, 0, (Color){ 100, 100, 100, 255 });
+			}
 			break;
 		case SCENE_CUBE:
 			if (g_scene.type == SCENE3D) DrawCube((Vector3){ obj.x, obj.y, obj.z}, obj.w, obj.l, obj.h, obj.color);
@@ -103,7 +114,7 @@ void draw_scene_object(SceneObject obj) {
 			if (g_scene.type == SCENE3D) DrawSphere((Vector3){ obj.x, obj.y, obj.z}, obj.radius, obj.color);
 			break;
 		case SCENE_RECTANGLE:
-			if (g_scene.type == SCENE2D) DrawRectangle(obj.x, obj.y, obj.w, obj.h, obj.color);
+			if (g_scene.type == SCENE2D) DrawRectanglePro((Rectangle){ obj.x, obj.y, obj.w, obj.h}, (Vector2){ obj.w / 2.0f, obj.h / 2.0f}, obj.rotation, obj.color);
 			break;
 		case SCENE_CIRCLE:
 			if (g_scene.type == SCENE2D) DrawCircle(obj.x, obj.y, obj.radius, obj.color);
@@ -164,6 +175,10 @@ void ResetSceneCamera() {
     g_scene.camera3D.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     g_scene.camera3D.fovy = 90.0f;
     g_scene.camera3D.projection = CAMERA_PERSPECTIVE;
+
+    g_scene.camera2D.offset = (Vector2){ 0.0f, 0.0f };
+    g_scene.camera2D.target = (Vector2){ 0.0f, 0.0f };
+    g_scene.camera2D.zoom = 10.0f;
 }
 
 void SaveScene(const char* path) {

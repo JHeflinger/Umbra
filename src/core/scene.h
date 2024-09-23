@@ -73,6 +73,8 @@ Scene* GetScene();
 
 void InitializeScene();
 
+void ResetScene();
+
 void DrawScene();
 
 void DrawSceneStage(size_t stage);

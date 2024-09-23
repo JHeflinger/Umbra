@@ -12,6 +12,7 @@ void UpdateChain(ARRLIST_PathString* paths) {
 	for (int i = 0; i < paths->size; i++) {
 		int found = 0;
 		PathString str = ARRLIST_PathString_get(paths, i);
+		if (str.scenefile == 1) continue;
 		if (str.active == 1) {
 			for (int j = 0; j < g_active_shaders.size; j++) {
 				PathString cmpstr = ARRLIST_PathString_get(&g_active_shaders, j);

@@ -13,6 +13,7 @@ warn when a scene object wil not be rendered bc there isn't a shader stage for i
 next up:
 - default scene / load .slumbra file
 - edit file feature
+- set error handler/ debug logger / capture output of glfw and raylib errors too/ etc
 - profiler
 - hot reloading for everything
 - debugger

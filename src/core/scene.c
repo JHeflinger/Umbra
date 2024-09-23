@@ -128,9 +128,15 @@ Scene* GetScene() {
 }
 
 void InitializeScene() {	
-	LoadSceneError err = LoadScene("default.slumbra");
-	if (err.type != NONE)
-		printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+	//LoadSceneError err = LoadScene("default.slumbra");
+	//if (err.type != NONE)
+	//	printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+}
+
+void ResetScene() {
+	ARRLIST_SceneObject_clear(&g_scene.objects);
+	g_scene = (Scene){ 0 };
+	ResetSceneCamera();
 }
 
 void DrawScene() {

@@ -128,9 +128,6 @@ Scene* GetScene() {
 }
 
 void InitializeScene() {	
-	//LoadSceneError err = LoadScene("default.slumbra");
-	//if (err.type != NONE)
-	//	printf("error: %d on line %d\n", (int)err.type, (int)err.line);
 }
 
 void ResetScene() {

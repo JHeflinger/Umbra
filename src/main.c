@@ -1,6 +1,6 @@
-#include "core/editor.h"
+#include "core/app.h"
 
 int main(int argc, char* argv[]) {
-	RunEditor();
+	RunApp();
     return 0;
 }

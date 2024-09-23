@@ -34,6 +34,7 @@ void DrawExplorer(float x, float y, float w, float h) {
 						} else {
 							LoadSceneError err = LoadScene(ps.raw);
 							if (err.type != NONE) {
+								printf("error: %d on line %d\n", (int)err.type, (int)err.line);
 								g_shader_paths.data[i].error_color = 255.0f;
 							} else {
 								for (int j = 0; j < g_shader_paths.size; j++)

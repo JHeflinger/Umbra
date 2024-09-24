@@ -12,6 +12,7 @@ char g_path[PATH_SIZE] = { 0 };
 ARRLIST_Line g_buffer = { 0 };
 float g_editor_disposition = 0.0f;
 int g_cursor_line = 0;
+int g_cursor_column = 0;
 
 void clean_buffer() {
 	for (int i = 0; i < g_buffer.size; i++)
@@ -37,7 +38,7 @@ void DrawEditor(float x, float y, float w, float h) {
 		if (IsKeyPressed(KEY_UP)) {
 			g_cursor_line = g_cursor_line > 0 ? g_cursor_line - 1 : g_cursor_line;
 			if ((g_cursor_line * 20) + g_editor_disposition < 0)
-				g_editor_disposition = g_cursor_line * -20.0f;
+				g_editor_disposition = g_cursor_line * -20;
 		}
 
 		int xpos = x + 20;
@@ -95,5 +96,6 @@ int LoadEditorBuffer(const char* path) {
 	strcpy(g_path, path);
 	g_editor_disposition = 0.0f;
 	g_cursor_line = 0;
+	g_cursor_column = 0;
     return 0;
 }

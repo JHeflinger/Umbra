@@ -2,6 +2,7 @@
 #include "utils/colors.h"
 #include "panels/chain.h"
 #include "core/scene.h"
+#include "panels/editor.h"
 #include "raylib.h"
 
 ARRLIST_PathString g_shader_paths = { 0 };
@@ -50,7 +51,9 @@ void DrawExplorer(float x, float y, float w, float h) {
 					}
 				}
 				if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-					g_editor_selected = i;
+					if (LoadEditorBuffer(g_shader_paths.data[i].raw) == 0)
+						g_editor_selected = i;
+					else g_shader_paths.data[i].error_color = 255.0f;
 				}
 				DrawRectangle(xpos - 5, ypos - 2, MeasureText(ps.raw, 14) + 4 + 30, 18, GRAY_2);
 				xpos += 20;

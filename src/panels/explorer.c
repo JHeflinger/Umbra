@@ -6,6 +6,7 @@
 
 ARRLIST_PathString g_shader_paths = { 0 };
 float g_explorer_disposition = 0.0f;
+int g_editor_selected = -1;
 
 void InitializeExplorer() {
     PopulateFilePaths(&g_shader_paths, ".fs", ".vs", ".slumbra", ".");
@@ -20,6 +21,9 @@ void DrawExplorer(float x, float y, float w, float h) {
 	for (int i = 0; i < g_shader_paths.size; i++) {
 		int ypos = y + 10 + (20*i) + g_explorer_disposition;
 		int xpos = x + 10;
+		if (i == g_editor_selected) {
+			DrawRectangle(x, ypos - 3, w, 20, GRAY_2);
+		}
 		if (ypos < y + h && ypos > -20.0f) {
 			PathString ps = ARRLIST_PathString_get(&g_shader_paths, i);
 			if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, ypos - 2, w, 18 })) {
@@ -44,6 +48,9 @@ void DrawExplorer(float x, float y, float w, float h) {
 							}
 						}
 					}
+				}
+				if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+					g_editor_selected = i;
 				}
 				DrawRectangle(xpos - 5, ypos - 2, MeasureText(ps.raw, 14) + 4 + 30, 18, GRAY_2);
 				xpos += 20;

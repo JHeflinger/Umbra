@@ -1,17 +1,20 @@
 #include "editor.h"
+#include "utils/files.h"
 #include "raylib.h"
 #include "easymemory.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 char* g_file_buffer = NULL;
+char g_path[PATH_SIZE];
 size_t g_file_size = 0;
 
 void DrawEditor(float x, float y, float w, float h) {
-	DrawText("No file loaded!", x + w/2 - (MeasureText("No file loaded!", 14) / 2), y + 20, 14, RAYWHITE);
-	DrawText("Right-click a file to load it!", x + w/2 - (MeasureText("Right-click a file to load it!", 14) / 2), y + 40, 14, RAYWHITE);
-	if (g_file_buffer != NULL) {
-		DrawText(g_file_buffer, x, y + 80, 14, RAYWHITE);
+	if (g_file_buffer == NULL) {
+		DrawText("No file loaded!", x + w/2 - (MeasureText("No file loaded!", 14) / 2), y + 20, 14, RAYWHITE);
+		DrawText("Right-click a file to load it!", x + w/2 - (MeasureText("Right-click a file to load it!", 14) / 2), y + 40, 14, RAYWHITE);
+	} else {
+		DrawText(g_file_buffer, x + 10, y + 10, 14, RAYWHITE);
 	}
 }
 

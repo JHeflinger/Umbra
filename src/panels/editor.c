@@ -11,6 +11,7 @@ IMPL_ARRLIST(Line);
 char g_path[PATH_SIZE] = { 0 };
 ARRLIST_Line g_buffer = { 0 };
 float g_editor_disposition = 0.0f;
+float g_horizontal_editor_disposition = 0.0f;
 int g_cursor_line = 0;
 int g_cursor_column = 0;
 
@@ -41,7 +42,7 @@ void DrawEditor(float x, float y, float w, float h) {
 				g_editor_disposition = g_cursor_line * -20;
 		}
 
-		int xpos = x + 20;
+		int xpos = x + 20 - g_horizontal_editor_disposition;
 		size_t sudosize = g_buffer.size;
 		while (sudosize > 0) {
 			xpos += MeasureText("0", 14);
@@ -53,9 +54,10 @@ void DrawEditor(float x, float y, float w, float h) {
 			if (ypos >= y + h) break;
 			char buf[1024];
 			sprintf(buf, "%d", i + 1);
-			DrawText(buf, x + 5, ypos, 14, (Color){ 170, 170, 170, 255 });
-			if (i == g_cursor_line)
+			DrawText(buf, x + 5 - g_horizontal_editor_disposition, ypos, 14, (Color){ 170, 170, 170, 255 });
+			if (i == g_cursor_line) {
 				DrawRectangle(xpos - 10, ypos - 3, w, 20, (Color){ 60, 60, 150, 255 });
+			}
 			DrawText(g_buffer.data[i].string.data, xpos, ypos, 14, RAYWHITE);
 		}
 	}

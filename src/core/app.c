@@ -132,13 +132,13 @@ void DrawOverlay() {
 }
 
 void DrawPanels() {
-    DrawViewport(0, NAMEBAR_HEIGHT, g_central_divider, GetScreenHeight() - NAMEBAR_HEIGHT);
     if (g_tr_semi_focused == EXPLORER_FOCUSED)
 	    DrawExplorer(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, g_sub_divider);
 	else if (g_tr_semi_focused == EDITOR_FOCUSED)
 	    DrawEditor(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, g_sub_divider);
 	if (g_br_semi_focused == CHAIN_FOCUSED)
 		DrawChain(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, GetScreenHeight() - NAMEBAR_HEIGHT - NAMEBAR_HEIGHT - g_sub_divider);
+    DrawViewport(0, NAMEBAR_HEIGHT, g_central_divider, GetScreenHeight() - NAMEBAR_HEIGHT);
 }
 
 void RunApp() {

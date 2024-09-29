@@ -13,7 +13,7 @@ ARRLIST_Line g_buffer = { 0 };
 float g_editor_disposition = 0.0f;
 float g_horizontal_editor_disposition = 0.0f;
 int g_cursor_line = 0;
-int g_cursor_column = 0;
+int g_cursor_column = 5;
 
 void clean_buffer() {
 	for (int i = 0; i < g_buffer.size; i++)
@@ -22,6 +22,8 @@ void clean_buffer() {
 }
 
 void DrawEditor(float x, float y, float w, float h) {
+	static float g_cursor_timer = 0.0f;
+	static float g_cursor_timer_toggle = 0;
 	if (g_path[0] == 0) {
 		DrawText("No file loaded!", x + w/2 - (MeasureText("No file loaded!", 14) / 2), y + 20, 14, RAYWHITE);
 		DrawText("Right-click a file to load it!", x + w/2 - (MeasureText("Right-click a file to load it!", 14) / 2), y + 40, 14, RAYWHITE);
@@ -29,36 +31,74 @@ void DrawEditor(float x, float y, float w, float h) {
 		if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, y, w, h }))
 			g_editor_disposition += GetMouseWheelMoveV().y * 20.0f;
 		g_editor_disposition = g_editor_disposition > 0.0f ? 0.0f : (g_editor_disposition < -20.0f * (g_buffer.size + 1) + h ? -20.0f * (g_buffer.size + 1) + h : g_editor_disposition);
-
-		if (IsKeyPressed(KEY_DOWN)) {
-			g_cursor_line = g_cursor_line < g_buffer.size - 1 ? g_cursor_line + 1 : g_cursor_line;
-			if (((g_cursor_line + 2) * 20) + g_editor_disposition > h)
-				g_editor_disposition = h - ((g_cursor_line + 2) * 20);
-		}
-
-		if (IsKeyPressed(KEY_UP)) {
-			g_cursor_line = g_cursor_line > 0 ? g_cursor_line - 1 : g_cursor_line;
-			if ((g_cursor_line * 20) + g_editor_disposition < 0)
-				g_editor_disposition = g_cursor_line * -20;
-		}
-
+		if ((g_buffer.size + 1) * 20.0f < h) g_editor_disposition = 0.0f;
 		int xpos = x + 20 - g_horizontal_editor_disposition;
 		size_t sudosize = g_buffer.size;
 		while (sudosize > 0) {
 			xpos += MeasureText("0", 14);
 			sudosize /= 10;
 		}
-		DrawRectangle(x, y, xpos - 10 - x, h, (Color){ 50, 50, 50, 255 });
+		if (IsKeyPressed(KEY_DOWN)) {
+			g_cursor_line = g_cursor_line < g_buffer.size - 1 ? g_cursor_line + 1 : g_cursor_line;
+			if (((g_cursor_line + 2) * 20) + g_editor_disposition > h)
+				g_editor_disposition = h - ((g_cursor_line + 2) * 20);
+			if (g_cursor_column < 0) g_cursor_column = 0;
+			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+		}
+		if (IsKeyPressed(KEY_UP)) {
+			g_cursor_line = g_cursor_line > 0 ? g_cursor_line - 1 : g_cursor_line;
+			if ((g_cursor_line * 20) + g_editor_disposition < 0)
+				g_editor_disposition = g_cursor_line * -20;
+			if (g_cursor_column < 0) g_cursor_column = 0;
+			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+		}
+		if (IsKeyPressed(KEY_RIGHT)) {
+			g_cursor_column++;
+			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+			char* rulerstr = EZALLOC(g_cursor_column + 1, sizeof(char));
+			memcpy(rulerstr, g_buffer.data[g_cursor_line].string.data, g_cursor_column * sizeof(char));
+			float xdif = MeasureTextEx(GetFontDefault(), rulerstr, 14, 3).x;
+			EZFREE(rulerstr);
+			if (xpos + xdif > x + w)
+				g_horizontal_editor_disposition += (xpos + xdif) - (x + w);
+		}
+		if (IsKeyPressed(KEY_LEFT)) {
+			g_cursor_column--;
+			if (g_cursor_column < 0) g_cursor_column = 0;
+			char* rulerstr = EZALLOC(g_cursor_column + 1, sizeof(char));
+			memcpy(rulerstr, g_buffer.data[g_cursor_line].string.data, g_cursor_column * sizeof(char));
+			float xdif = MeasureTextEx(GetFontDefault(), rulerstr, 14, 3).x;
+			EZFREE(rulerstr);
+			if (xpos + xdif < xpos + g_horizontal_editor_disposition)
+				g_horizontal_editor_disposition -= (xpos + g_horizontal_editor_disposition) - (xpos + xdif) - 3;
+		}
+		for (int i = 0; i < g_buffer.size; i++) {
+			int ypos = y + 10 + (i * 20) + g_editor_disposition;
+			if (ypos >= y + h) break;
+			if (i == g_cursor_line) {
+				DrawRectangle(xpos - 10 + g_horizontal_editor_disposition, ypos - 3, w, 20, (Color){ 60, 60, 150, 255 });
+			}
+			DrawTextEx(GetFontDefault(), g_buffer.data[i].string.data, (Vector2){xpos, ypos}, 14, 3, RAYWHITE);
+			if (i == g_cursor_line) {
+				g_cursor_timer = g_cursor_timer_toggle == 0 ? g_cursor_timer + GetFrameTime() : g_cursor_timer - GetFrameTime();
+				if (g_cursor_timer > 0.5f) g_cursor_timer_toggle = 1;
+				else if (g_cursor_timer < 0.0f) g_cursor_timer_toggle = 0;
+				if (g_cursor_timer_toggle) {
+					char* rulerstr = EZALLOC(g_cursor_column + 1, sizeof(char));
+					memcpy(rulerstr, g_buffer.data[i].string.data, g_cursor_column * sizeof(char));
+					float xdif = MeasureTextEx(GetFontDefault(), rulerstr, 14, 3).x;
+					EZFREE(rulerstr);
+					DrawRectangle(xpos + xdif, ypos - 3, 2, 20, RAYWHITE);
+				}
+			}
+		}
+		DrawRectangle(x, y, xpos - 10 - x + g_horizontal_editor_disposition, h, (Color){ 50, 50, 50, 255 });
 		for (int i = 0; i < g_buffer.size; i++) {
 			int ypos = y + 10 + (i * 20) + g_editor_disposition;
 			if (ypos >= y + h) break;
 			char buf[1024];
 			sprintf(buf, "%d", i + 1);
-			DrawText(buf, x + 5 - g_horizontal_editor_disposition, ypos, 14, (Color){ 170, 170, 170, 255 });
-			if (i == g_cursor_line) {
-				DrawRectangle(xpos - 10, ypos - 3, w, 20, (Color){ 60, 60, 150, 255 });
-			}
-			DrawText(g_buffer.data[i].string.data, xpos, ypos, 14, RAYWHITE);
+			DrawText(buf, x + 5, ypos, 14, (Color){ 170, 170, 170, 255 });
 		}
 	}
 }

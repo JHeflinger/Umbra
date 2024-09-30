@@ -24,12 +24,6 @@ void clean_buffer() {
 void DrawEditor(float x, float y, float w, float h) {
 	static float g_cursor_timer = 0.0f;
 	static float g_cursor_timer_toggle = 0;
-	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-		Vector2 mousecoords = GetMousePosition();
-		if (CheckCollisionPointRec(mousecoords, (Rectangle){x, y, w, h})) {
-			
-		}
-	}
 	if (g_path[0] == 0) {
 		DrawText("No file loaded!", x + w/2 - (MeasureText("No file loaded!", 14) / 2), y + 20, 14, RAYWHITE);
 		DrawText("Right-click a file to load it!", x + w/2 - (MeasureText("Right-click a file to load it!", 14) / 2), y + 40, 14, RAYWHITE);
@@ -43,6 +37,29 @@ void DrawEditor(float x, float y, float w, float h) {
 		while (sudosize > 0) {
 			xpos += MeasureText("0", 14);
 			sudosize /= 10;
+		}
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousecoords = GetMousePosition();
+			if (CheckCollisionPointRec(mousecoords, (Rectangle){x, y, w, h})) {
+				g_cursor_line = (mousecoords.y - y - g_editor_disposition - 10) / 20;
+				char* interbuf = EZALLOC(g_buffer.data[g_cursor_line].string.size + 1, sizeof(char));
+				g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+				for (int i = 0; i < g_buffer.data[g_cursor_line].string.size; i++) {
+					interbuf[i] = g_buffer.data[g_cursor_line].string.data[i];
+					char charbuf[2] = { 0 };
+					float spos = xpos + MeasureTextEx(GetFontDefault(), interbuf, 14, 3).x;
+					if (mousecoords.x <= spos) {
+						charbuf[0] = interbuf[i];
+						float midpoint = spos - (MeasureText(charbuf, 14)/2.0f);
+						if (mousecoords.x <= midpoint)
+							g_cursor_column = i;
+						else
+							g_cursor_column = i + 1;
+						break;
+					}
+				}
+				EZFREE(interbuf);
+			}
 		}
 		if (IsKeyPressed(KEY_DOWN)) {
 			g_cursor_timer_toggle = 1;

@@ -24,6 +24,12 @@ void clean_buffer() {
 void DrawEditor(float x, float y, float w, float h) {
 	static float g_cursor_timer = 0.0f;
 	static float g_cursor_timer_toggle = 0;
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		Vector2 mousecoords = GetMousePosition();
+		if (CheckCollisionPointRec(mousecoords, (Rectangle){x, y, w, h})) {
+			
+		}
+	}
 	if (g_path[0] == 0) {
 		DrawText("No file loaded!", x + w/2 - (MeasureText("No file loaded!", 14) / 2), y + 20, 14, RAYWHITE);
 		DrawText("Right-click a file to load it!", x + w/2 - (MeasureText("Right-click a file to load it!", 14) / 2), y + 40, 14, RAYWHITE);
@@ -39,6 +45,8 @@ void DrawEditor(float x, float y, float w, float h) {
 			sudosize /= 10;
 		}
 		if (IsKeyPressed(KEY_DOWN)) {
+			g_cursor_timer_toggle = 1;
+			g_cursor_timer = 0.5f;
 			g_cursor_line = g_cursor_line < g_buffer.size - 1 ? g_cursor_line + 1 : g_cursor_line;
 			if (((g_cursor_line + 2) * 20) + g_editor_disposition > h)
 				g_editor_disposition = h - ((g_cursor_line + 2) * 20);
@@ -46,6 +54,8 @@ void DrawEditor(float x, float y, float w, float h) {
 			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
 		}
 		if (IsKeyPressed(KEY_UP)) {
+			g_cursor_timer_toggle = 1;
+			g_cursor_timer = 0.5f;
 			g_cursor_line = g_cursor_line > 0 ? g_cursor_line - 1 : g_cursor_line;
 			if ((g_cursor_line * 20) + g_editor_disposition < 0)
 				g_editor_disposition = g_cursor_line * -20;
@@ -53,6 +63,8 @@ void DrawEditor(float x, float y, float w, float h) {
 			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
 		}
 		if (IsKeyPressed(KEY_RIGHT)) {
+			g_cursor_timer_toggle = 1;
+			g_cursor_timer = 0.5f;
 			g_cursor_column++;
 			if (g_cursor_column > g_buffer.data[g_cursor_line].string.size) g_cursor_column = g_buffer.data[g_cursor_line].string.size;
 			char* rulerstr = EZALLOC(g_cursor_column + 1, sizeof(char));
@@ -63,6 +75,8 @@ void DrawEditor(float x, float y, float w, float h) {
 				g_horizontal_editor_disposition += (xpos + xdif) - (x + w);
 		}
 		if (IsKeyPressed(KEY_LEFT)) {
+			g_cursor_timer_toggle = 1;
+			g_cursor_timer = 0.5f;
 			g_cursor_column--;
 			if (g_cursor_column < 0) g_cursor_column = 0;
 			char* rulerstr = EZALLOC(g_cursor_column + 1, sizeof(char));

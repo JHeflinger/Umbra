@@ -137,22 +137,16 @@ void DrawEditor(float x, float y, float w, float h) {
 		}
 		if (IsKeyPressed(KEY_ENTER)) {
 			Line newstring = { 0 };
-			printf("one\n");
 			for (int i = g_cursor_column; i < g_buffer.data[g_cursor_line].string.size; i++) {
 				ARRLIST_char_add(&newstring.string, g_buffer.data[g_cursor_line].string.data[i]);
 				g_buffer.data[g_cursor_line].string.data[i] = '\0';
 			}
-			printf("two\n");
 			g_buffer.data[g_cursor_line].string.size = g_cursor_column;
-			printf("three\n");
 			ARRLIST_Line_add(&g_buffer, newstring);
-			printf("four\n");
 			for (int i = g_buffer.size - 1; i > g_cursor_line; i--) {
-				memcpy(g_buffer.data + i + 1, g_buffer.data + i, sizeof(Line));
+				memcpy(&g_buffer.data[i], &g_buffer.data[i - 1], sizeof(Line));
 			}
-			printf("five\n");
 			memcpy(g_buffer.data + g_cursor_line + 1, &newstring, sizeof(Line));
-			printf("size\n");
 			g_cursor_line++;
 			g_cursor_column = 0;
 		}

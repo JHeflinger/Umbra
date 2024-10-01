@@ -103,6 +103,27 @@ void DrawEditor(float x, float y, float w, float h) {
 			if (xpos + xdif < xpos + g_horizontal_editor_disposition)
 				g_horizontal_editor_disposition -= (xpos + g_horizontal_editor_disposition) - (xpos + xdif) - 3;
 		}
+		if (IsKeyPressed(KEY_BACKSPACE)) {
+			if (g_buffer.data[g_cursor_line].string.size <= 0 && g_cursor_line > 0) {
+				ARRLIST_char_clear(&g_buffer.data[g_cursor_line].string);
+				ARRLIST_Line_remove(&g_buffer, g_cursor_line);
+				g_cursor_line--;
+				g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+			} else if (g_buffer.data[g_cursor_line].string.size > 0) {
+				if (g_cursor_column <= 0 && g_cursor_line > 0) {
+					g_cursor_column = g_buffer.data[g_cursor_line - 1].string.size;
+					for (int i = 0; i < g_buffer.data[g_cursor_line].string.size; i++)
+						ARRLIST_char_add(&g_buffer.data[g_cursor_line - 1].string, g_buffer.data[g_cursor_line].string.data[i]);
+					ARRLIST_char_clear(&g_buffer.data[g_cursor_line].string);
+					ARRLIST_Line_remove(&g_buffer, g_cursor_line);
+					g_cursor_line--;
+				} else if (g_cursor_column > 0) {
+					ARRLIST_char_remove(&g_buffer.data[g_cursor_line].string, g_cursor_column - 1);
+					g_buffer.data[g_cursor_line].string.data[g_buffer.data[g_cursor_line].string.size] = '\0';
+					g_cursor_column--;
+				}	
+			}
+		}
 		for (int i = 0; i < g_buffer.size; i++) {
 			int ypos = y + 10 + (i * 20) + g_editor_disposition;
 			if (ypos >= y + h) break;

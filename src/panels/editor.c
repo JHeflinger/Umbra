@@ -124,11 +124,32 @@ void DrawEditor(float x, float y, float w, float h) {
 				}	
 			}
 		}
+		if (IsKeyPressed(KEY_DELETE)) {
+			if (g_cursor_column == g_buffer.data[g_cursor_line].string.size && g_buffer.size > 0 && g_cursor_line < g_buffer.size - 1) {
+				for (int i = 0; i < g_buffer.data[g_cursor_line + 1].string.size; i++)
+					ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, g_buffer.data[g_cursor_line + 1].string.data[i]);
+				ARRLIST_char_clear(&g_buffer.data[g_cursor_line + 1].string);
+				ARRLIST_Line_remove(&g_buffer, g_cursor_line + 1);
+			} else if (g_cursor_column != g_buffer.data[g_cursor_line].string.size) {
+				ARRLIST_char_remove(&g_buffer.data[g_cursor_line].string, g_cursor_column);
+				g_buffer.data[g_cursor_line].string.data[g_buffer.data[g_cursor_line].string.size] = '\0';
+			}
+		}
+		if (IsKeyPressed(KEY_ENTER)) {
+
+		}
+		char c = '\0';
+		while ((c = GetCharPressed()) != 0) {
+		}
 		for (int i = 0; i < g_buffer.size; i++) {
 			int ypos = y + 10 + (i * 20) + g_editor_disposition;
 			if (ypos >= y + h) break;
 			if (i == g_cursor_line) {
 				DrawRectangle(xpos - 10 + g_horizontal_editor_disposition, ypos - 3, w, 20, (Color){ 60, 60, 150, 255 });
+			}
+			if (g_buffer.data[i].string.size == g_buffer.data[i].string.maxsize) {
+				ARRLIST_char_add(&g_buffer.data[i].string, '\0');
+				ARRLIST_char_remove(&g_buffer.data[i].string, g_buffer.data[i].string.size - 1);
 			}
 			DrawTextEx(GetFontDefault(), g_buffer.data[i].string.data, (Vector2){xpos, ypos}, 14, 3, RAYWHITE);
 			if (i == g_cursor_line) {

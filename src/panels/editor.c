@@ -150,8 +150,16 @@ void DrawEditor(float x, float y, float w, float h) {
 			g_cursor_line++;
 			g_cursor_column = 0;
 		}
-		char c = '\0';
+		int c = '\0';
 		while ((c = GetCharPressed()) != 0) {
+			if (c >= 32 && c <= 126) {
+				char curr = (char)c;
+				ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, curr);
+				for (int i = g_buffer.data[g_cursor_line].string.size - 1; i > g_cursor_column + 1; i--)
+					g_buffer.data[g_cursor_line].string.data[i] = g_buffer.data[g_cursor_line].string.data[i - 1];
+				g_buffer.data[g_cursor_line].string.data[g_cursor_column] = curr;
+				g_cursor_column++;
+			}
 		}
 		for (int i = 0; i < g_buffer.size; i++) {
 			int ypos = y + 10 + (i * 20) + g_editor_disposition;

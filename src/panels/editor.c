@@ -155,7 +155,7 @@ void DrawEditor(float x, float y, float w, float h) {
 			if (c >= 32 && c <= 126) {
 				char curr = (char)c;
 				ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, curr);
-				for (int i = g_buffer.data[g_cursor_line].string.size - 1; i > g_cursor_column + 1; i--)
+				for (int i = g_buffer.data[g_cursor_line].string.size - 1; i > g_cursor_column; i--)
 					g_buffer.data[g_cursor_line].string.data[i] = g_buffer.data[g_cursor_line].string.data[i - 1];
 				g_buffer.data[g_cursor_line].string.data[g_cursor_column] = curr;
 				g_cursor_column++;

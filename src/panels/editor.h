@@ -15,4 +15,8 @@ void DrawEditor(float x, float y, float w, float h);
 
 int LoadEditorBuffer(const char* path);
 
+int IsEditorSaved();
+
+void SaveEditorBuffer();
+
 #endif

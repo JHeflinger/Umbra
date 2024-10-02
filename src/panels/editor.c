@@ -14,6 +14,7 @@ float g_editor_disposition = 0.0f;
 float g_horizontal_editor_disposition = 0.0f;
 int g_cursor_line = 0;
 int g_cursor_column = 5;
+int g_editor_saved = 1;
 
 void clean_buffer() {
 	for (int i = 0; i < g_buffer.size; i++)
@@ -109,6 +110,7 @@ void DrawEditor(float x, float y, float w, float h) {
 				ARRLIST_Line_remove(&g_buffer, g_cursor_line);
 				g_cursor_line--;
 				g_cursor_column = g_buffer.data[g_cursor_line].string.size;
+				g_editor_saved = 0;
 			} else if (g_buffer.data[g_cursor_line].string.size > 0) {
 				if (g_cursor_column <= 0 && g_cursor_line > 0) {
 					g_cursor_column = g_buffer.data[g_cursor_line - 1].string.size;
@@ -117,10 +119,12 @@ void DrawEditor(float x, float y, float w, float h) {
 					ARRLIST_char_clear(&g_buffer.data[g_cursor_line].string);
 					ARRLIST_Line_remove(&g_buffer, g_cursor_line);
 					g_cursor_line--;
+					g_editor_saved = 0;
 				} else if (g_cursor_column > 0) {
 					ARRLIST_char_remove(&g_buffer.data[g_cursor_line].string, g_cursor_column - 1);
 					g_buffer.data[g_cursor_line].string.data[g_buffer.data[g_cursor_line].string.size] = '\0';
 					g_cursor_column--;
+					g_editor_saved = 0;
 				}	
 			}
 		}
@@ -130,9 +134,11 @@ void DrawEditor(float x, float y, float w, float h) {
 					ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, g_buffer.data[g_cursor_line + 1].string.data[i]);
 				ARRLIST_char_clear(&g_buffer.data[g_cursor_line + 1].string);
 				ARRLIST_Line_remove(&g_buffer, g_cursor_line + 1);
+				g_editor_saved = 0;
 			} else if (g_cursor_column != g_buffer.data[g_cursor_line].string.size) {
 				ARRLIST_char_remove(&g_buffer.data[g_cursor_line].string, g_cursor_column);
 				g_buffer.data[g_cursor_line].string.data[g_buffer.data[g_cursor_line].string.size] = '\0';
+				g_editor_saved = 0;
 			}
 		}
 		if (IsKeyPressed(KEY_ENTER)) {
@@ -149,17 +155,23 @@ void DrawEditor(float x, float y, float w, float h) {
 			memcpy(g_buffer.data + g_cursor_line + 1, &newstring, sizeof(Line));
 			g_cursor_line++;
 			g_cursor_column = 0;
+			g_editor_saved = 0;
 		}
-		int c = '\0';
-		while ((c = GetCharPressed()) != 0) {
-			if (c >= 32 && c <= 126) {
-				char curr = (char)c;
-				ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, curr);
-				for (int i = g_buffer.data[g_cursor_line].string.size - 1; i > g_cursor_column; i--)
-					g_buffer.data[g_cursor_line].string.data[i] = g_buffer.data[g_cursor_line].string.data[i - 1];
-				g_buffer.data[g_cursor_line].string.data[g_cursor_column] = curr;
-				g_cursor_column++;
+		if (!IsKeyDown(KEY_LEFT_CONTROL)) {
+			int c = '\0';
+			while ((c = GetCharPressed()) != 0) {
+				if (c >= 32 && c <= 126) {
+					char curr = (char)c;
+					ARRLIST_char_add(&g_buffer.data[g_cursor_line].string, curr);
+					for (int i = g_buffer.data[g_cursor_line].string.size - 1; i > g_cursor_column; i--)
+						g_buffer.data[g_cursor_line].string.data[i] = g_buffer.data[g_cursor_line].string.data[i - 1];
+					g_buffer.data[g_cursor_line].string.data[g_cursor_column] = curr;
+					g_cursor_column++;
+					g_editor_saved = 0;
+				}
 			}
+		} else if (IsKeyPressed(KEY_S)) {
+			SaveEditorBuffer();	
 		}
 		for (int i = 0; i < g_buffer.size; i++) {
 			int ypos = y + 10 + (i * 20) + g_editor_disposition;
@@ -232,5 +244,15 @@ int LoadEditorBuffer(const char* path) {
 	g_editor_disposition = 0.0f;
 	g_cursor_line = 0;
 	g_cursor_column = 0;
+	g_editor_saved = 1;
     return 0;
+}
+
+int IsEditorSaved() {
+	return g_editor_saved;
+}
+
+void SaveEditorBuffer() {
+	printf("path to save: %s\n", g_path);
+	g_editor_saved = 1;
 }

@@ -59,7 +59,7 @@ void DrawOverlay() {
     if (g_tr_semi_focused == EXPLORER_FOCUSED) {
         DRAW_TAB(g_central_divider + 5, 5, 70, NAMEBAR_HEIGHT - 5, GRAY_2);
     } else if (g_tr_semi_focused == EDITOR_FOCUSED) {
-        DRAW_TAB(g_central_divider + 5 + 70 + 5, 5, 60, NAMEBAR_HEIGHT - 5, GRAY_2);
+        DRAW_TAB(g_central_divider + 5 + 70 + 5, 5, IsEditorSaved() ? 60 : 70, NAMEBAR_HEIGHT - 5, GRAY_2);
     } else {
         printf("bad top-right focus value detected\n");
         exit(1);
@@ -75,7 +75,7 @@ void DrawOverlay() {
 
     DrawText("Viewport", 10, 10, 14, g_focused_window == VIEWPORT_FOCUSED ? YELLOW : GRAY_X);
     DrawText("Explorer", g_central_divider + 10 + DIVIDER_WIDTH, 10, 14, g_focused_window == EXPLORER_FOCUSED ? YELLOW : GRAY_X);
-    DrawText("Editor", g_central_divider + 10 + DIVIDER_WIDTH + 70 + 10, 10, 14, g_focused_window == EDITOR_FOCUSED ? YELLOW : GRAY_X);
+    DrawText(IsEditorSaved() ? "Editor" : "Editor*", g_central_divider + 10 + DIVIDER_WIDTH + 70 + 10, 10, 14, g_focused_window == EDITOR_FOCUSED ? YELLOW : GRAY_X);
     DrawText("Profiler", g_central_divider + 10 + DIVIDER_WIDTH, g_sub_divider + NAMEBAR_HEIGHT + 10, 14, g_focused_window == PROFILER_FOCUSED ? YELLOW : GRAY_X);
     DrawText("Shader Chain", g_central_divider + 10 + DIVIDER_WIDTH + 65 + 10, g_sub_divider + NAMEBAR_HEIGHT + 10, 14, g_focused_window == CHAIN_FOCUSED ? YELLOW : GRAY_X);
 

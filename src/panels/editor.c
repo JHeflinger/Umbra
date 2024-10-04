@@ -253,6 +253,14 @@ int IsEditorSaved() {
 }
 
 void SaveEditorBuffer() {
-	printf("path to save: %s\n", g_path);
+	FILE* file = fopen(g_path, "w");
+	if (file == NULL) {
+		printf("Unable to save file %s\n", g_path);
+		return;
+	}
+	for (int i = 0; i < g_buffer.size; i++) {
+		fprintf(file, "%s\n", g_buffer.data[i].string.data);
+	}
+	fclose(file);
 	g_editor_saved = 1;
 }

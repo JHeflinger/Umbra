@@ -275,7 +275,11 @@ void SaveEditorBuffer() {
 	if (ps.scenefile) {
 		Scene* scene;
 		if ((scene = GetScene()) && strcmp(scene->path, ps.raw) == 0) {
-			printf("TODO: Refresh loaded scene\n");
+			LoadSceneError err = LoadScene(ps.raw);
+			if (err.type != NONE) {
+				printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+				return;
+			}
 		}
 	} else {
 		PathString* active_shader;

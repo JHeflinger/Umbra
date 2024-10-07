@@ -69,3 +69,12 @@ void DrawExplorer(float x, float y, float w, float h) {
 		}
 	}
 }
+
+int MatchPath(PathString* pathstr, const char* path) {
+	PathString ps = { 0 };
+	for (int i = 0; i < g_shader_paths.size; i++) {
+		*pathstr = g_shader_paths.data[i];
+		if (strcmp(pathstr->raw, path) == 0) return 0;
+	}
+	return -1;
+}

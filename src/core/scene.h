@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "utils/structs.h"
+#include "utils/files.h"
 
 typedef enum {
     SCENE2D = 0,
@@ -41,6 +42,7 @@ typedef struct {
     Camera camera3D;
     Camera2D camera2D;
 	ARRLIST_SceneObject objects;
+	char path[PATH_SIZE];
 } Scene;
 
 typedef enum {

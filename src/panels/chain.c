@@ -113,3 +113,10 @@ void CleanChain() {
 		UnloadShader(g_active_shaders.data[i].shader.shader);
 	}
 }
+
+PathString* MatchPathInChain(const char* path) {
+	for (int i = 0; i < g_active_shaders.size; i++) {
+		if (strcmp(g_active_shaders.data[i].raw, path) == 0) return &(g_active_shaders.data[i]);
+	}
+	return NULL;
+}

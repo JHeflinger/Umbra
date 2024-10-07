@@ -475,6 +475,7 @@ LoadSceneError LoadScene(const char* path) {
 	fclose(file);
 	ARRLIST_SceneObject_clear(&g_scene.objects);
 	g_scene = tempscene;
+	strcpy(g_scene.path, path);
 	ResetSceneCamera();
 	return error;
 	#undef RETERR

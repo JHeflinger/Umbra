@@ -7,4 +7,6 @@ void InitializeExplorer();
 
 void DrawExplorer(float x, float y, float w, float h);
 
+int MatchPath(PathString* pathstr, const char* path);
+
 #endif

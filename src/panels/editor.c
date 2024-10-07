@@ -1,5 +1,8 @@
 #include "editor.h"
+#include "core/scene.h"
 #include "utils/files.h"
+#include "panels/chain.h"
+#include "panels/explorer.h"
 #include "raylib.h"
 #include "easymemory.h"
 #include <stdio.h>
@@ -263,4 +266,21 @@ void SaveEditorBuffer() {
 	}
 	fclose(file);
 	g_editor_saved = 1;
+
+	PathString ps = { 0 };
+	if (MatchPath(&ps, g_path) != 0) {
+		printf("File does not exist in the explorer\n");
+		return;
+	}
+	if (ps.scenefile) {
+		Scene* scene;
+		if ((scene = GetScene()) && strcmp(scene->path, ps.raw) == 0) {
+			printf("TODO: Refresh loaded scene\n");
+		}
+	} else {
+		PathString* active_shader;
+		if ((active_shader = MatchPathInChain(ps.raw))) {
+			printf("TODO: Refresh loaded shader\n");
+		}
+	}
 }

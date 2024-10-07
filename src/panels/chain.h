@@ -13,4 +13,6 @@ Shader GetShaderInChain(size_t index);
 
 void CleanChain();
 
+PathString* MatchPathInChain(const char* path);
+
 #endif

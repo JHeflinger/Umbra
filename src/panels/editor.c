@@ -284,7 +284,10 @@ void SaveEditorBuffer() {
 	} else {
 		PathString* active_shader;
 		if ((active_shader = MatchPathInChain(ps.raw))) {
-			printf("TODO: Refresh loaded shader\n");
+			if (active_shader->shader.active) {
+				UnloadShader(active_shader->shader.shader);
+				active_shader->shader.shader = active_shader->alternate ? LoadShader(ps.raw, 0) : LoadShader(0, ps.raw);
+			}
 		}
 	}
 }

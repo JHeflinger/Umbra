@@ -3,6 +3,7 @@
 #include "panels/chain.h"
 #include "panels/viewport.h"
 #include "panels/explorer.h"
+#include "panels/console.h"
 #include "panels/editor.h"
 #include "raylib.h"
 #include <stdio.h>
@@ -35,7 +36,7 @@ typedef enum {
 	VIEWPORT_FOCUSED = 0,
 	EXPLORER_FOCUSED = 1,
     EDITOR_FOCUSED = 2,
-    PROFILER_FOCUSED = 3,
+    CONSOLE_FOCUSED = 3,
     CHAIN_FOCUSED = 4
 } FOCUSED_WINDOW;
 
@@ -64,7 +65,7 @@ void DrawOverlay() {
         printf("bad top-right focus value detected\n");
         exit(1);
     }
-    if (g_br_semi_focused == PROFILER_FOCUSED) {
+    if (g_br_semi_focused == CONSOLE_FOCUSED) {
         DRAW_TAB(g_central_divider + 5, 5 + g_sub_divider + NAMEBAR_HEIGHT, 65, NAMEBAR_HEIGHT - 5, GRAY_2);
     } else if (g_br_semi_focused == CHAIN_FOCUSED) {
         DRAW_TAB(g_central_divider + 5 + 65 + 5, 5 + g_sub_divider + NAMEBAR_HEIGHT, 110, NAMEBAR_HEIGHT - 5, GRAY_2);
@@ -76,7 +77,7 @@ void DrawOverlay() {
     DrawText("Viewport", 10, 10, 14, g_focused_window == VIEWPORT_FOCUSED ? YELLOW : GRAY_X);
     DrawText("Explorer", g_central_divider + 10 + DIVIDER_WIDTH, 10, 14, g_focused_window == EXPLORER_FOCUSED ? YELLOW : GRAY_X);
     DrawText(IsEditorSaved() ? "Editor" : "Editor*", g_central_divider + 10 + DIVIDER_WIDTH + 70 + 10, 10, 14, g_focused_window == EDITOR_FOCUSED ? YELLOW : GRAY_X);
-    DrawText("Profiler", g_central_divider + 10 + DIVIDER_WIDTH, g_sub_divider + NAMEBAR_HEIGHT + 10, 14, g_focused_window == PROFILER_FOCUSED ? YELLOW : GRAY_X);
+    DrawText("Console", g_central_divider + 10 + DIVIDER_WIDTH, g_sub_divider + NAMEBAR_HEIGHT + 10, 14, g_focused_window == CONSOLE_FOCUSED ? YELLOW : GRAY_X);
     DrawText("Shader Chain", g_central_divider + 10 + DIVIDER_WIDTH + 65 + 10, g_sub_divider + NAMEBAR_HEIGHT + 10, 14, g_focused_window == CHAIN_FOCUSED ? YELLOW : GRAY_X);
 
     DRAW_VERTICAL_DIVIDER();
@@ -99,8 +100,8 @@ void DrawOverlay() {
             g_focused_window = EXPLORER_FOCUSED;
         else g_focused_window = EDITOR_FOCUSED;
     } else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), (Rectangle){ g_central_divider, NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider, GetScreenWidth() - g_central_divider, GetScreenHeight() - (NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider) })) {
-        if (g_br_semi_focused == PROFILER_FOCUSED)
-            g_focused_window = PROFILER_FOCUSED;
+        if (g_br_semi_focused == CONSOLE_FOCUSED)
+            g_focused_window = CONSOLE_FOCUSED;
         else g_focused_window = CHAIN_FOCUSED;
     }
 
@@ -111,8 +112,8 @@ void DrawOverlay() {
         g_tr_semi_focused = EDITOR_FOCUSED;
         g_focused_window = EDITOR_FOCUSED;
     } else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), (Rectangle){ g_central_divider + 5, 5 + g_sub_divider + NAMEBAR_HEIGHT, 65, NAMEBAR_HEIGHT - 5 })) {
-        g_br_semi_focused = PROFILER_FOCUSED;
-        g_focused_window = PROFILER_FOCUSED;
+        g_br_semi_focused = CONSOLE_FOCUSED;
+        g_focused_window = CONSOLE_FOCUSED;
     } else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), (Rectangle){ g_central_divider + 5 + 65 + 5, 5 + g_sub_divider + NAMEBAR_HEIGHT, 110, NAMEBAR_HEIGHT - 5 })) {
         g_br_semi_focused = CHAIN_FOCUSED;
         g_focused_window = CHAIN_FOCUSED;
@@ -138,6 +139,9 @@ void DrawPanels() {
 	    DrawEditor(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, g_sub_divider);
 	if (g_br_semi_focused == CHAIN_FOCUSED)
 		DrawChain(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, GetScreenHeight() - NAMEBAR_HEIGHT - NAMEBAR_HEIGHT - g_sub_divider);
+    else if (g_br_semi_focused == CONSOLE_FOCUSED)
+		DrawConsole(g_central_divider + DIVIDER_WIDTH, NAMEBAR_HEIGHT + NAMEBAR_HEIGHT + g_sub_divider, GetScreenWidth() - g_central_divider - DIVIDER_WIDTH, GetScreenHeight() - NAMEBAR_HEIGHT - NAMEBAR_HEIGHT - g_sub_divider);
+    
     DrawViewport(0, NAMEBAR_HEIGHT, g_central_divider, GetScreenHeight() - NAMEBAR_HEIGHT);
 }
 

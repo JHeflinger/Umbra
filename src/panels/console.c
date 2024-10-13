@@ -37,5 +37,14 @@ void ConsoleError(const char* log) {
 }
 
 void DrawConsole(float x, float y, float w, float h) {
-    DrawRectangle(x, y, w, h, RED);
+    for (int i = 0; i < g_console_num_logs; i++) {
+        int ypos = y + (i * 20);
+        if (g_console_history[i][0] != '\0') {
+            Color color = g_console_history_types[i] == CONSOLE_TRACE ? RAYWHITE :
+                (g_console_history_types[i] == CONSOLE_INFO ? GREEN :
+                (g_console_history_types[i] == CONSOLE_WARN ? YELLOW :
+                (g_console_history_types[i] == CONSOLE_ERROR ? RED : PURPLE)));
+			DrawText(g_console_history[i], x + 5, ypos, 14, color);
+        }
+    }
 }

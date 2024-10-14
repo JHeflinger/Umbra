@@ -151,10 +151,6 @@ void RunApp() {
     InitWindow(1600, 900, "Umbra");
     InitializeViewport();
 	InitializeExplorer();
-    ConsoleTrace("This is a log trace");
-    ConsoleInfo("This is a log info");
-    ConsoleWarn("This is a log warn");
-    ConsoleError("This is a log error");
     while(!WindowShouldClose()) {
         UpdateViewport();
         if (g_focused_window == VIEWPORT_FOCUSED) ViewportInput();

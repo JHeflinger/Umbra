@@ -1,4 +1,6 @@
 #include "console.h"
+#include <stdlib.h>
+#include <string.h>
 #include "raylib.h"
 
 char g_console_history[CONSOLE_HISTORY][MAX_LOG_LENGTH] = { 0 };
@@ -37,8 +39,9 @@ void ConsoleError(const char* log) {
 }
 
 void DrawConsole(float x, float y, float w, float h) {
-    for (int i = 0; i < g_console_num_logs; i++) {
-        int ypos = y + (i * 20);
+    for (int i = g_console_num_logs - 1; i >= 0; i--) {
+        int ypos = y + h - ((g_console_num_logs - i) * 20);
+		if (ypos < y - 20) break;
         if (g_console_history[i][0] != '\0') {
             Color color = g_console_history_types[i] == CONSOLE_TRACE ? RAYWHITE :
                 (g_console_history_types[i] == CONSOLE_INFO ? GREEN :

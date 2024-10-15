@@ -89,4 +89,6 @@ void SaveScene(const char* path);
 
 LoadSceneError LoadScene(const char* path);
 
+void ErrorDescription(char* description, LoadSceneError error);
+
 #endif

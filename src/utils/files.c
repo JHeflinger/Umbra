@@ -1,4 +1,5 @@
 #include "files.h"
+#include "panels/console.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,12 +85,16 @@ void PopulateFilePaths(ARRLIST_PathString* paths, const char* extension, const c
 int SaveFile(const char* data, size_t datalen, const char* path) {
     FILE *file = fopen(path, "wb");
     if (file == NULL) {
-        printf("Error opening file to save %s\n", path);
+		char errbuff[1024];
+        sprintf(errbuff, "Error opening file to save %s\n", path);
+		ConsoleError(errbuff);
         return -1;
     }
     size_t written = fwrite(data, sizeof(char), datalen, file);
     if (written != datalen) {
-        printf("Error writing file to save %s\n", path);
+		char errbuff[1024];
+        sprintf(errbuff, "Error writing file to save %s\n", path);
+		ConsoleError(errbuff);
         return -1;
     }
     fclose(file);

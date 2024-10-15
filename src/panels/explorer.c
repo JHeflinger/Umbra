@@ -3,6 +3,7 @@
 #include "panels/chain.h"
 #include "core/scene.h"
 #include "panels/editor.h"
+#include "panels/console.h"
 #include "raylib.h"
 
 ARRLIST_PathString g_shader_paths = { 0 };
@@ -39,7 +40,11 @@ void DrawExplorer(float x, float y, float w, float h) {
 						} else {
 							LoadSceneError err = LoadScene(ps.raw);
 							if (err.type != NONE) {
-								printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+								char errbuff[2048];
+								char description[1024];
+								ErrorDescription(description, err);
+								sprintf(errbuff, "[ERROR][%d] %s on line %d", (int)err.type, description, (int)err.line);
+								ConsoleError(errbuff);
 								g_shader_paths.data[i].error_color = 255.0f;
 							} else {
 								for (int j = 0; j < g_shader_paths.size; j++)
@@ -71,7 +76,6 @@ void DrawExplorer(float x, float y, float w, float h) {
 }
 
 int MatchPath(PathString* pathstr, const char* path) {
-	PathString ps = { 0 };
 	for (int i = 0; i < g_shader_paths.size; i++) {
 		*pathstr = g_shader_paths.data[i];
 		if (strcmp(pathstr->raw, path) == 0) return 0;

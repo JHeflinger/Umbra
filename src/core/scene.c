@@ -480,3 +480,62 @@ LoadSceneError LoadScene(const char* path) {
 	return error;
 	#undef RETERR
 }
+
+void ErrorDescription(char* description, LoadSceneError error) {
+	switch (error.type) {
+		case NONE:
+			strcpy(description, "NONE");
+			break;
+		case UNABLE_TO_OPEN_FILE:
+			strcpy(description, "UNABLE_TO_OPEN_FILE");
+			break;
+		case OBNOXIOUS_LONG_LINE:
+			strcpy(description, "OBNOXIOUS_LONG_LINE");
+			break;
+		case NO_START_SCENE_MONIKER:
+			strcpy(description, "NO_START_SCENE_MONIKER");
+			break;
+		case INVALID_NUM_SCENE_ARGS:
+			strcpy(description, "INVALID_NUM_SCENE_ARGS");
+			break;
+		case INVALID_SCENE_ARG:
+			strcpy(description, "INVALID_SCENE_ARG");
+			break;
+		case INVALID_OBJECT_MONIKER:
+			strcpy(description, "INVALID_OBJECT_MONIKER");
+			break;
+		case NO_START_BRACKET:
+			strcpy(description, "NO_START_BRACKET");
+			break;
+		case INVALID_NUM_OBJECT_ARGS:
+			strcpy(description, "INVALID_NUM_OBJECT_ARGS");
+			break;
+		case UNALLOWED_END_BRACKET:
+			strcpy(description, "UNALLOWED_END_BRACKET");
+			break;
+		case INVALID_PROPERTY:
+			strcpy(description, "INVALID_PROPERTY");
+			break;
+		case OUTSIDE_SCENE_DEF:
+			strcpy(description, "OUTSIDE_SCENE_DEF");
+			break;
+		case UNALLOWED_START_BRACKET:
+			strcpy(description, "UNALLOWED_START_BRACKET");
+			break;
+		case NOT_A_FLOAT:
+			strcpy(description, "NOT_A_FLOAT");
+			break;
+		case INVALID_NUM_ARGS:
+			strcpy(description, "INVALID_NUM_ARGS");
+			break;
+		case NOT_AN_INT:
+			strcpy(description, "NOT_AN_INT");
+			break;
+		case SHOULD_NEVER_HAPPEN:
+			strcpy(description, "SHOULD_NEVER_HAPPEN");
+			break;
+		default:
+			strcpy(description, "??? what ??");
+			break;
+	}
+}

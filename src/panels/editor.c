@@ -3,6 +3,7 @@
 #include "utils/files.h"
 #include "panels/chain.h"
 #include "panels/explorer.h"
+#include "panels/console.h"
 #include "raylib.h"
 #include "easymemory.h"
 #include <stdio.h>
@@ -214,7 +215,9 @@ void DrawEditor(float x, float y, float w, float h) {
 int LoadEditorBuffer(const char* path) {
 	FILE* file = fopen(path, "r");
     if (!file) {
-        printf("Error opening file %s", path);
+		char errbuff[1024];
+        sprintf(errbuff, "Error opening file %s", path);
+		ConsoleError(errbuff);
         return -1;
     }
     fseek(file, 0, SEEK_END);
@@ -222,7 +225,9 @@ int LoadEditorBuffer(const char* path) {
     rewind(file);
     char* buffer = EZALLOC(file_size + 1, sizeof(char));
     if (!buffer) {
-        printf("Memory allocation failed\n");
+		char errbuff[1024];
+        sprintf(errbuff, "Memory allocation failed\n");
+		ConsoleError(errbuff);
         fclose(file);
         return -1;
     }
@@ -258,7 +263,9 @@ int IsEditorSaved() {
 void SaveEditorBuffer() {
 	FILE* file = fopen(g_path, "w");
 	if (file == NULL) {
-		printf("Unable to save file %s\n", g_path);
+		char errbuff[2048];
+		sprintf(errbuff, "Unable to save file %s\n", g_path);
+		ConsoleError(errbuff);
 		return;
 	}
 	for (int i = 0; i < g_buffer.size; i++) {
@@ -269,7 +276,9 @@ void SaveEditorBuffer() {
 
 	PathString ps = { 0 };
 	if (MatchPath(&ps, g_path) != 0) {
-		printf("File does not exist in the explorer\n");
+		char errbuff[1024];
+		sprintf(errbuff, "File does not exist in the explorer\n");
+		ConsoleError(errbuff);
 		return;
 	}
 	if (ps.scenefile) {
@@ -277,7 +286,11 @@ void SaveEditorBuffer() {
 		if ((scene = GetScene()) && strcmp(scene->path, ps.raw) == 0) {
 			LoadSceneError err = LoadScene(ps.raw);
 			if (err.type != NONE) {
-				printf("error: %d on line %d\n", (int)err.type, (int)err.line);
+				char errbuff[2048];
+				char description[1024];
+				ErrorDescription(description, err);
+				sprintf(errbuff, "[ERROR][%d] %s on line %d", (int)err.type, description, (int)err.line);
+				ConsoleError(errbuff);
 				return;
 			}
 		}
